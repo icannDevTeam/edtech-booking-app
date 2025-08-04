@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Booking - Albert Arthur</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center py-8 font-sans">
+  <!-- Header -->
+  <header class="mb-6 text-center w-full max-w-5xl">
+    <h1 class="text-4xl font-bold text-blue-800">Book a Time with Mr. Albert</h1>
+    <p class="text-gray-600 mt-2">EdTech Teacher & Learning Specialist</p>
+
+    <!-- Photo Section -->
+    <div class="mt-4 flex justify-center">
+      <div class="bg-white shadow-md rounded-lg p-2">
+        <img src="your-goofy-photo.jpg" alt="Mr. Albert with Students" class="rounded-lg max-h-48 object-cover">
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard -->
+  <section id="dashboard" class="mb-6 flex gap-6">
+    <div class="bg-white shadow-md p-4 rounded-lg text-center">
+      <p class="text-lg font-semibold text-gray-700">Available Slots</p>
+      <p id="availableCount" class="text-2xl font-bold text-green-600">0</p>
+    </div>
+    <div class="bg-white shadow-md p-4 rounded-lg text-center">
+      <p class="text-lg font-semibold text-gray-700">Booked Slots</p>
+      <p id="bookedCount" class="text-2xl font-bold text-red-600">0</p>
+    </div>
+  </section>
+
+  <!-- Schedule Container -->
+  <div id="schedule" class="grid grid-cols-1 md:grid-cols-5 gap-6 w-11/12 max-w-6xl"></div>
+
+  <!-- Controls -->
+  <div class="mt-8 flex gap-4">
+    <button id="resetBookings" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+      Reset Bookings
+    </button>
+  </div>
+
+  <script>
+    const scheduleData = {
+      Monday: ["7:30-7:50", "9:10-9:30", "11:30-12:10", "14:10-15:30"],
+      Tuesday: ["7:30-7:50", "9:10-9:30", "11:30-12:10"],
+      Wednesday: ["7:30-7:50", "10:50-12:10"],
+      Thursday: ["7:30-7:50", "9:10-9:30", "11:30-12:10"],
+      Friday: ["7:30-7:50", "10:50-11:30", "13:30-14:10"]
+    };
+
+    let bookedSlots = JSON.parse(localStorage.getItem("bookedSlots")) || {};
+
+    const scheduleContainer = document.getElementById("schedule");
+    const availableCountEl = document.getElementById("availableCount");
+    const bookedCountEl = document.getElementById("bookedCount");
+
+    function renderSchedule() {
+      scheduleContainer.innerHTML = "";
+      let availableCount = 0;
+      let bookedCount = 0;
+
+      for (const day in scheduleData) {
+        const dayColumn = document.createElement("div");
+        dayColumn.className = "bg-white p-4 rounded-lg shadow-md flex flex-col";
+
+        const title = document.createElement("h2");
+        title.className = "text-xl font-semibold mb-3 text-center border-b pb-2";
+        title.textContent = day;
+        dayColumn.appendChild(title);
+
+        scheduleData[day].forEach(slot => {
+          const slotKey = `${day}-${slot}`;
+          const btn = document.createElement("button");
+
+          const isAutoBooked = (day === "Monday" || day === "Thursday");
+          const isBooked = bookedSlots[slotKey] || isAutoBooked;
+
+          btn.textContent = `${slot} ${isBooked ? "(Booked)" : "(Available)"}`;
+          btn.className = `w-full px-3 py-2 mb-2 rounded text-white font-medium transition
+            ${isBooked ? "bg-red-500 cursor-not-allowed" : "bg-green-500 hover:bg-green-600"}`;
+          btn.disabled = isBooked;
+
+          if (isBooked) {
+            bookedCount++;
+          } else {
+            availableCount++;
+            btn.addEventListener("click", () => {
+              bookedSlots[slotKey] = true;
+              localStorage.setItem("bookedSlots", JSON.stringify(bookedSlots));
+              renderSchedule();
+            });
+          }
+
+          dayColumn.appendChild(btn);
+        });
+
+        scheduleContainer.appendChild(dayColumn);
+      }
+
+      // Update dashboard
+      availableCountEl.textContent = availableCount;
+      bookedCountEl.textContent = bookedCount;
+    }
+
+    document.getElementById("resetBookings").addEventListener("click", () => {
+      localStorage.removeItem("bookedSlots");
+      bookedSlots = {};
+      renderSchedule();
+    });
+
+    renderSchedule();
+  </script>
+</body>
+</html>
