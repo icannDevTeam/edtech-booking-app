@@ -19,10 +19,14 @@ exports.createBooking = (req, res) => {
                 if (err) return res.status(500).json({ error: err.message });
 
                 // Send confirmation email to teacher and booker
+
+                // Send confirmation email to booker
                 sendEmail(studentEmail, 'Booking Confirmation', 
                     `Hey ${studentName}, your booking for ${day} at ${time} is confirmed!`);
-                
-                sendEmail(process.env.ADMIN_EMAIL, 'New Booking Alert', 
+
+                // Send notification to admin/teacher
+                const adminEmail = process.env.ADMIN_EMAIL || 'albert.arthur@binus.edu';
+                sendEmail(adminEmail, 'New Booking Alert', 
                     `${studentName} (${studentClass}) booked ${day} at ${time}`);
 
                 res.status(201).json({ id: this.lastID, message: 'Booking successful!' });
