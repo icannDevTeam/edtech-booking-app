@@ -54,20 +54,20 @@ exports.sendTestEmail = onRequest(async (req, res) => {
 // Firestore trigger: send email when a new booking is created (v2 API)
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 exports.sendBookingEmail = onDocumentCreated("bookings/{bookingId}", async (event) => {
-  const data = event.data?.fields;
-  if (!data || !data.studentEmail?.stringValue) {
+  const data = event.data?.data();
+  if (!data || !data.studentEmail) {
     logger.error('Missing booking data or studentEmail');
     return;
   }
   try {
     const sendSmtpEmail = {
-      to: [{ email: data.studentEmail.stringValue, name: data.studentName?.stringValue || 'Student' }],
+      to: [{ email: data.studentEmail, name: data.studentName || 'Student' }],
       sender: { email: 'your@email.com', name: 'Your Name' },
       subject: 'Your Booking is Confirmed!',
-      htmlContent: `<h1>Booking Confirmed</h1><p>Hi ${data.studentName?.stringValue || ''},<br>Your booking for ${data.date?.stringValue} at ${data.time?.stringValue} is confirmed!</p>`
+      htmlContent: `<h1>Booking Confirmed</h1><p>Hi ${data.studentName || ''},<br>Your booking for ${data.date} at ${data.time} is confirmed!</p>`
     };
     await emailApi.sendTransacEmail(sendSmtpEmail);
-    logger.info('Booking confirmation email sent to', data.studentEmail.stringValue);
+    logger.info('Booking confirmation email sent to', data.studentEmail);
   } catch (err) {
     logger.error('Failed to send booking email', err);
   }
