@@ -37,7 +37,7 @@ exports.sendTestEmail = onRequest(async (req, res) => {
   try {
     const sendSmtpEmail = {
       to: [{ email: req.body.to || 'your@email.com', name: req.body.name || 'Test User' }],
-      sender: { email: 'your@email.com', name: 'Your Name' },
+      sender: { email: 'arthurapp05@gmail.com', name: 'Your Name' },
       subject: 'Test Email from Firebase Function',
       htmlContent: '<h1>Hello from Firebase & Brevo!</h1><p>This is a test email.</p>'
     };
@@ -62,7 +62,7 @@ exports.sendBookingEmail = onDocumentCreated("bookings/{bookingId}", async (even
   try {
     const sendSmtpEmail = {
       to: [{ email: data.studentEmail, name: data.studentName || 'Student' }],
-      sender: { email: 'your@email.com', name: 'Your Name' },
+      sender: { email: 'arthurapp05@gmail.com', name: 'Your Name' },
       subject: 'Your Booking is Confirmed!',
       htmlContent: `<h1>Booking Confirmed</h1><p>Hi ${data.studentName || ''},<br>Your booking for ${data.date} at ${data.time} is confirmed!</p>`
     };
