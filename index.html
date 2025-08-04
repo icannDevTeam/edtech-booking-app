@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Teacher Booking – Albert Arthur</title>
+  <!-- Tailwind & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  <style>
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* Custom scroll for booked slots preview */
+    .booked-scroll { max-height: 420px; overflow-y: auto; }
+    /* Brand colors */
+    .bg-maroon { background-color: #800000; }
+    .hover\:bg-maroon-dark:hover { background-color: #660000; }
+    .text-maroon { color: #800000; }
+    .border-maroon { border-color: #800000; }
+    .bg-yellow-brand { background-color: #FFD600; }
+    .text-yellow-brand { color: #FFD600; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="container mx-auto px-4 py-6 max-w-6xl">
+    <!-- Header -->
+    <header class="mb-6 relative">
+      <div class="text-center">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-800">
+          Book a Time with Mr. Albert
+        </h1>
+        <p class="text-gray-600">EdTech Teacher | BINUS School Simprug</p>
+      </div>
+      <img
+        src="./images/simprug.png"
+        alt="BINUS School Logo"
+        class="absolute top-0 right-0 h-16 w-auto"
+      />
+    </header>
+
+    <!-- Divider -->
+    <div class="flex justify-center mb-6">
+      <div class="w-16 h-1 bg-blue-500 rounded-full"></div>
+    </div>
+
+    <!-- Banner -->
+    <section class="mb-8">
+      <img
+        src="./images/Albert_motion.jpg"
+        alt="Goofy Banner"
+        class="w-full h-64 object-cover rounded-lg shadow-md"
+      />
+    </section>
+
+    <!-- Booking Calendar -->
+    <section class="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-10">
+      <h2 class="flex items-center text-xl font-semibold text-gray-800 mb-6">
+        <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>
+        Pick Your Date & Slot
+      </h2>
+      <!-- Date Range Picker -->
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <div class="flex-1">
+          <label for="bookingDate" class="block text-sm font-medium text-gray-700 mb-1">
+            Select a date (single)
+          </label>
+          <input
+            type="date"
+            id="bookingDate"
+            class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Or pick a date range
+          </label>
+          <div class="flex gap-2">
+            <input
+              type="date"
+              id="rangeStart"
+              class="flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            />
+            <span class="self-center">to</span>
+            <input
+              type="date"
+              id="rangeEnd"
+              class="flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex-1">
+          <p id="loading" class="text-center text-gray-500 mb-4 hidden">Loading slots…</p>
+          <div
+            id="slotsContainer"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-4"
+          ></div>
+        </div>
+        <!-- Booked Slots Preview -->
+        <aside class="w-full lg:w-72 bg-gray-50 border border-gray-200 rounded-lg p-4 booked-scroll">
+          <h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center">
+            <i class="fas fa-list mr-2"></i>Booked Slots
+          </h3>
+          <ul id="bookedPreview" class="space-y-2 text-sm"></ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Gallery -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-semibold text-center text-blue-800 mb-6">
+        Life in Our EdTech Class
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <img src="./images/Grade1.jpg" alt="Grade 1" class="h-60 w-full object-cover rounded-lg shadow-lg" />
+        <img src="./images/My_gys.jpg" alt="Fun Activity" class="h-60 w-full object-cover rounded-lg shadow-lg" />
+        <img src="./images/Space.jpg" alt="Space Learning" class="h-60 w-full object-cover rounded-lg shadow-lg" />
+        <img src="./images/Girlsclub.jpg" alt="Girls Club" class="h-60 w-full object-cover rounded-lg shadow-lg" />
+        <img src="./images/Madeit.jpg" alt="Project Success" class="h-60 w-full object-cover rounded-lg shadow-lg" />
+        <img src="./images/Coding.jpg" alt="Coding Time" class="h-60 w-full object-cover rounded-lg shadow-lg" />
+      </div>
+    </section>
+  </div>
+
+  <!-- Booking Modal -->
+  <div
+    id="bookingModal"
+    class="fixed inset-0 hidden flex items-center justify-center bg-black bg-opacity-50 z-50"
+  >
+    <div class="w-full max-w-md mx-4 bg-white rounded-lg p-6 shadow-lg fade-in">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-gray-800">Confirm Booking</h3>
+        <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700 text-lg">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <p class="mb-2 text-gray-600">You're booking:</p>
+      <p id="slotInfo" class="mb-4 text-blue-600 font-semibold text-lg"></p>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+        <input
+          id="studentName"
+          type="text"
+          placeholder="Enter your name"
+          class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Your Class</label>
+        <input
+          id="studentClass"
+          type="text"
+          placeholder="Enter your class (e.g. 4A)"
+          class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+        <input
+          id="studentEmail"
+          type="email"
+          placeholder="Enter your email"
+          class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div class="flex flex-col sm:flex-row sm:justify-end gap-3 mt-4">
+        <button
+          id="cancelBtn"
+          class="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
+        >
+          Cancel
+        </button>
+        <button
+          id="confirmBtn"
+          class="flex-1 sm:flex-none px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+        >
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
+
+  <!-- Booking Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, addDoc,
+      query, where, connectFirestoreEmulator
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    // Firebase config (copy yours)
+    const firebaseConfig = {
+      apiKey:    "AIzaSyBKhgPEWHqW36Xg0Bx6qwsXq9Hnew0094o",
+      authDomain:"school-booking-platform.firebaseapp.com",
+      projectId: "school-booking-platform",
+      storageBucket: "school-booking-platform.appspot.com",
+      messagingSenderId:"673281572597",
+      appId:     "1:673281572597:web:fe0ceec0054560f6258fbc",
+      measurementId:"G-TVQ5PK5WZF"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    // If you run the emulator locally:
+    // connectFirestoreEmulator(db, 'localhost', 8080);
+
+    // Firestore collection
+    const bookingsCol = collection(db, "bookings");
+    // Add waiting list collection
+    const waitingCol = collection(db, "waiting_list");
+
+    // Hard-coded slots by weekday
+    const timeSlots = {
+      Monday:    ["7:30-7:50","9:10-9:30","11:30-12:10","14:10-15:30"],
+      Tuesday:   ["7:30-7:50","9:10-9:30","11:30-12:10"],
+      Wednesday: ["7:30-7:50","10:50-12:10"],
+      Thursday:  ["7:30-7:50","9:10-9:30","11:30-12:10"],
+      Friday:    ["7:30-7:50","10:50-11:30","13:30-14:10"]
+    };
+
+    // DOM refs
+    const dateInput   = document.getElementById("bookingDate");
+    const rangeStart  = document.getElementById("rangeStart");
+    const rangeEnd    = document.getElementById("rangeEnd");
+    const loadingEl   = document.getElementById("loading");
+    const slotsEl     = document.getElementById("slotsContainer");
+    const modalEl     = document.getElementById("bookingModal");
+    const closeBtn    = document.getElementById("closeModalBtn");
+    const cancelBtn   = document.getElementById("cancelBtn");
+    const confirmBtn  = document.getElementById("confirmBtn");
+    const slotInfoEl  = document.getElementById("slotInfo");
+    const nameInput   = document.getElementById("studentName");
+    const classInput  = document.getElementById("studentClass");
+    const emailInput  = document.getElementById("studentEmail");
+    const bookedPreview = document.getElementById("bookedPreview");
+
+    let selDate = "", selTime = "";
+    let bookedTimes = new Set();
+    let bookedDetails = [];
+
+    // Initialize date picker range → today … today+6
+    const today = new Date();
+    const pad = n => n.toString().padStart(2,"0");
+    const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    dateInput.min = iso(today);
+    rangeStart.min = iso(today);
+    rangeEnd.min = iso(today);
+    const maxDate = new Date(today.getTime() + 6*24*60*60*1000);
+    dateInput.max = iso(maxDate);
+    rangeStart.max = iso(maxDate);
+    rangeEnd.max = iso(maxDate);
+    dateInput.value = iso(today);
+
+    // Listen for changes
+    dateInput.addEventListener("change", ()=>{
+      rangeStart.value = "";
+      rangeEnd.value = "";
+      loadBookings();
+    });
+    rangeStart.addEventListener("change", ()=>{
+      dateInput.value = "";
+      if(rangeEnd.value && rangeEnd.value < rangeStart.value) rangeEnd.value = rangeStart.value;
+      loadBookings();
+    });
+    rangeEnd.addEventListener("change", ()=>{
+      dateInput.value = "";
+      if(rangeStart.value && rangeEnd.value < rangeStart.value) rangeStart.value = rangeEnd.value;
+      loadBookings();
+    });
+
+    // Helper: get all dates in range
+    function getDatesInRange(start, end){
+      const dates = [];
+      let d = new Date(start);
+      const last = new Date(end);
+      while(d <= last){
+        dates.push(iso(d));
+        d.setDate(d.getDate()+1);
+      }
+      return dates;
+    }
+
+    // Load bookings for single date or range
+    async function loadBookings(){
+      bookedTimes.clear();
+      bookedDetails = [];
+      slotsEl.innerHTML = "";
+      bookedPreview.innerHTML = "";
+      let dates = [];
+      if(dateInput.value){
+        selDate = dateInput.value;
+        dates = [selDate];
+      } else if(rangeStart.value && rangeEnd.value){
+        dates = getDatesInRange(rangeStart.value, rangeEnd.value);
+      } else {
+        return;
+      }
+      loadingEl.classList.remove("hidden");
+      try {
+        // Query all bookings in date(s)
+        const q = query(bookingsCol, where("date", ">=", dates[0]), where("date", "<=", dates[dates.length-1]));
+        const snap = await getDocs(q);
+        snap.forEach(doc => {
+          const data = doc.data();
+          bookedTimes.add(`${data.date}|${data.time}`);
+          bookedDetails.push(data);
+        });
+        renderSlots(dates);
+        renderBookedPreview();
+      } catch(e){
+        slotsEl.innerHTML = `<p class="text-red-600">Failed to load slots.</p>`;
+        console.error(e);
+      } finally {
+        loadingEl.classList.add("hidden");
+      }
+    }
+
+    // Render slots for all selected dates
+    function renderSlots(dates){
+      slotsEl.innerHTML = "";
+      dates.forEach(dateStr => {
+        const weekday = new Date(dateStr).toLocaleDateString("en-US",{weekday:"long"});
+        const times = timeSlots[weekday];
+        if(!times) return;
+        const col = document.createElement("div");
+        col.className = "bg-gray-50 rounded-lg p-4";
+        const hdr = document.createElement("h3");
+        hdr.textContent = `${weekday} — ${dateStr}`;
+        hdr.className = "font-semibold text-lg text-gray-800 mb-3 border-b pb-2";
+        col.appendChild(hdr);
+        const list = document.createElement("div");
+        list.className = "space-y-2";
+        times.forEach(time => {
+          const btn = document.createElement("button");
+          const booked = bookedTimes.has(`${dateStr}|${time}`);
+          btn.textContent = `${time} ${booked? "(Booked)" : "(Available)"}`;
+          btn.disabled = booked;
+          btn.className = `w-full px-3 py-2 rounded border text-white font-medium ${
+            booked ? "bg-red-500" : "bg-green-500 hover:bg-green-600"
+          }`;
+          if(!booked) btn.onclick = () => openModal(dateStr, time);
+          list.appendChild(btn);
+        });
+        col.appendChild(list);
+        slotsEl.appendChild(col);
+      });
+    }
+
+    // Render vertical preview of booked slots
+    function renderBookedPreview(){
+      if(!bookedDetails.length){
+        bookedPreview.innerHTML = `<li class="text-gray-400">No bookings yet.</li>`;
+        return;
+      }
+      // Sort by date/time
+      bookedDetails.sort((a,b)=>{
+        if(a.date!==b.date) return a.date.localeCompare(b.date);
+        return a.time.localeCompare(b.time);
+      });
+      bookedPreview.innerHTML = bookedDetails.map(b=>
+        `<li class="border-l-4 border-blue-400 pl-2 py-1 bg-white rounded">
+          <span class="font-semibold text-blue-800">${b.date}</span>
+          <span class="ml-2 text-gray-700">${b.time}</span>
+          <div class="text-xs text-gray-500">${b.studentName} (${b.studentClass})</div>
+        </li>`
+      ).join("");
+    }
+
+    // Show the booking modal (now passes date)
+    function openModal(date, time){
+      selDate = date;
+      selTime = time;
+      slotInfoEl.textContent = `${selDate} @ ${selTime}`;
+      modalEl.classList.replace("hidden","flex");
+    }
+
+    // Hide modal + reset inputs
+    function closeModal(){
+      modalEl.classList.replace("flex","hidden");
+      nameInput.value = "";
+      classInput.value = "";
+      emailInput.value = "";
+    }
+
+    // Add: Helper to create ICS file content
+    function createICS({date, time, name, cls, email}) {
+      // Parse time range
+      const [startStr, endStr] = time.split("-");
+      const [year, month, day] = date.split("-");
+      function toICSDate(t) {
+        const [h, m] = t.split(":");
+        // Pad month/day
+        return `${year}${month.padStart(2,"0")}${day.padStart(2,"0")}T${h.padStart(2,"0")}${m}00`;
+      }
+      const dtStart = toICSDate(startStr);
+      const dtEnd = toICSDate(endStr);
+      return `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//EdTech Booking//EN
+BEGIN:VEVENT
+UID:${date}-${time}-${email}
+DTSTAMP:${dtStart}Z
+DTSTART:${dtStart}Z
+DTEND:${dtEnd}Z
+SUMMARY:Meeting with Mr. Albert
+DESCRIPTION:EdTech Booking for ${name} (${cls})\\nEmail: ${email}
+LOCATION:BINUS School Simprug
+END:VEVENT
+END:VCALENDAR`;
+    }
+
+    // Confirm & write to Firestore
+    confirmBtn.addEventListener("click", async ()=>{
+      const name  = nameInput.value.trim();
+      const cls   = classInput.value.trim();
+      const email = emailInput.value.trim().toLowerCase();
+
+      if(!name||!cls||!email) {
+        return alert("All fields are required.");
+      }
+      if(!email.endsWith("@binus.edu") && !email.endsWith("@binus.org")){
+        return alert("Use your school email (@binus.edu or @binus.org).");
+      }
+      // Double-check duplicate
+      if(bookedTimes.has(`${selDate}|${selTime}`)){
+        // Slot is booked, offer waiting list
+        showWaitingListModal(selDate, selTime, name, cls, email);
+        return;
+      }
+      try {
+        await addDoc(bookingsCol, {
+          date: selDate,
+          time: selTime,
+          studentName: name,
+          studentClass: cls,
+          studentEmail: email,
+          createdAt: new Date().toISOString()
+        });
+        bookedTimes.add(`${selDate}|${selTime}`);
+        bookedDetails.push({
+          date: selDate, time: selTime,
+          studentName: name, studentClass: cls
+        });
+        renderSlots(dateInput.value ? [selDate] : getDatesInRange(rangeStart.value, rangeEnd.value));
+        renderBookedPreview();
+        closeModal();
+
+        // Show invoice/confirmation with Add to Calendar
+        showInvoiceOverlay({
+          date: selDate, time: selTime,
+          name, cls, email
+        });
+      } catch(e){
+        console.error(e);
+        alert("Failed to save booking, please try again.");
+      }
+    });
+
+    // --- Invoice Overlay with Add to Calendar ---
+    function showInvoiceOverlay({date, time, name, cls, email}) {
+      const overlay = document.createElement("div");
+      overlay.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+      const icsContent = createICS({date, time, name, cls, email});
+      const icsBlob = new Blob([icsContent], {type: "text/calendar"});
+      const icsUrl = URL.createObjectURL(icsBlob);
+
+      overlay.innerHTML = `
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full fade-in text-center">
+          <h2 class="text-2xl font-bold text-green-600 mb-2">Booking Confirmed!</h2>
+          <div class="mb-3 text-left">
+            <div class="font-semibold text-blue-800">Date:</div>
+            <div>${date}</div>
+            <div class="font-semibold text-blue-800 mt-2">Time:</div>
+            <div>${time}</div>
+            <div class="font-semibold text-blue-800 mt-2">Name:</div>
+            <div>${name} (${cls})</div>
+            <div class="font-semibold text-blue-800 mt-2">Email:</div>
+            <div>${email}</div>
+          </div>
+          <a href="${icsUrl}" download="booking.ics"
+            class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >Add to Calendar (Outlook/Google)</a>
+          <p class="italic text-yellow-600 mt-4">
+            Here we go again… not being paid enough for this huh? 😂
+          </p>
+          <!-- Add to Calendar Buttons -->
+          <div class="flex justify-center space-x-4 mt-4">
+            <button id="addGoogleCalBtn" class="px-4 py-2 bg-yellow-brand text-maroon rounded hover:bg-yellow-400 transition">
+              Add to Google Calendar
+            </button>
+            <button id="addOutlookCalBtn" class="px-4 py-2 bg-maroon text-white rounded hover:bg-maroon-dark transition">
+              Add to Outlook Calendar
+            </button>
+          </div>
+          <button class="mt-6 px-4 py-2 border rounded text-gray-700 hover:bg-gray-100" id="closeInvoiceBtn">Close</button>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.querySelector("#closeInvoiceBtn").onclick = () => {
+        overlay.remove();
+        URL.revokeObjectURL(icsUrl);
+      };
+
+      // Add to Calendar handlers
+      const encode = encodeURIComponent;
+      function getCalTimes(date, time) {
+        // date: YYYY-MM-DD, time: "HH:MM-HH:MM"
+        const [startStr, endStr] = time.split("-");
+        const [year, month, day] = date.split("-");
+        function pad(n) { return n.padStart(2, "0"); }
+        // Google: YYYYMMDDTHHMMSSZ (UTC), Outlook: ISO
+        const start = `${year}${pad(month)}${pad(day)}T${startStr.replace(":","")}00Z`;
+        const end   = `${year}${pad(month)}${pad(day)}T${endStr.replace(":","")}00Z`;
+        const startISO = `${year}-${pad(month)}-${pad(day)}T${startStr}:00Z`;
+        const endISO   = `${year}-${pad(month)}-${pad(day)}T${endStr}:00Z`;
+        return { start, end, startISO, endISO };
+      }
+      const calTitle = "Meeting with Mr. Albert";
+      const calDesc = `EdTech Booking for ${name} (${cls})\\nEmail: ${email}`;
+      const calLoc = "BINUS School Simprug";
+      const { start, end, startISO, endISO } = getCalTimes(date, time);
+
+      overlay.querySelector("#addGoogleCalBtn").onclick = () => {
+        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE`
+          + `&text=${encode(calTitle)}`
+          + `&dates=${start}/${end}`
+          + `&details=${encode(calDesc)}`
+          + `&location=${encode(calLoc)}`;
+        window.open(url, '_blank');
+      };
+      overlay.querySelector("#addOutlookCalBtn").onclick = () => {
+        const url = `https://outlook.live.com/calendar/0/deeplink/compose?path=/calendar/view/Month&rru=addevent`
+          + `&startdt=${encode(startISO)}`
+          + `&enddt=${encode(endISO)}`
+          + `&subject=${encode(calTitle)}`
+          + `&body=${encode(calDesc)}`
+          + `&location=${encode(calLoc)}`;
+        window.open(url, '_blank');
+      };
+    }
+
+    // --- Waiting List Modal ---
+    function showWaitingListModal(date, time, name, cls, email) {
+      // Remove any existing modal
+      let old = document.getElementById("waitingListModal");
+      if (old) old.remove();
+      const modal = document.createElement("div");
+      modal.id = "waitingListModal";
+      modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+      modal.innerHTML = `
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full fade-in">
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">Slot Already Booked</h3>
+          <p class="mb-2 text-gray-600">Would you like to join the waiting list for:</p>
+          <div class="mb-2 text-maroon font-semibold">${date} @ ${time}</div>
+          <form id="waitingForm" class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+              <input type="text" id="waitName" value="${name||""}" required
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Your Class</label>
+              <input type="text" id="waitClass" value="${cls||""}" required
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
+              <input type="email" id="waitEmail" value="${email||""}" required
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div class="flex flex-col sm:flex-row sm:justify-end gap-3 mt-4">
+              <button type="button" id="cancelWaitBtn"
+                class="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition"
+              >Cancel</button>
+              <button type="submit"
+                class="flex-1 sm:flex-none px-4 py-2 bg-maroon text-white rounded hover:bg-maroon-dark transition"
+              >Join Waiting List</button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      modal.querySelector("#cancelWaitBtn").onclick = () => modal.remove();
+      modal.querySelector("#waitingForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const waitName = modal.querySelector("#waitName").value.trim();
+        const waitClass = modal.querySelector("#waitClass").value.trim();
+        const waitEmail = modal.querySelector("#waitEmail").value.trim().toLowerCase();
+        if(!waitName||!waitClass||!waitEmail){
+          alert("All fields are required.");
+          return;
+        }
+        if(!waitEmail.endsWith("@binus.edu") && !waitEmail.endsWith("@binus.org")){
+          alert("Use your school email (@binus.edu or @binus.org).");
+          return;
+        }
+        try {
+          await addDoc(waitingCol, {
+            date, time,
+            studentName: waitName,
+            studentClass: waitClass,
+            studentEmail: waitEmail,
+            createdAt: new Date().toISOString()
+          });
+          modal.remove();
+          showWaitingListConfirmation({date, time, waitName, waitClass, waitEmail});
+        } catch(e){
+          alert("Failed to join waiting list, please try again.");
+        }
+      };
+    }
+
+    // --- Waiting List Confirmation Overlay ---
+    function showWaitingListConfirmation({date, time, waitName, waitClass, waitEmail}) {
+      const overlay = document.createElement("div");
+      overlay.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+      overlay.innerHTML = `
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full fade-in text-center">
+          <h2 class="text-2xl font-bold text-blue-600 mb-2">Added to Waiting List!</h2>
+          <div class="mb-3 text-left">
+            <div class="font-semibold text-blue-800">Date:</div>
+            <div>${date}</div>
+            <div class="font-semibold text-blue-800 mt-2">Time:</div>
+            <div>${time}</div>
+            <div class="font-semibold text-blue-800 mt-2">Name:</div>
+            <div>${waitName} (${waitClass})</div>
+            <div class="font-semibold text-blue-800 mt-2">Email:</div>
+            <div>${waitEmail}</div>
+          </div>
+          <p class="italic text-yellow-600 mt-4">
+            We'll notify you if this slot becomes available!
+          </p>
+          <button class="mt-6 px-4 py-2 border rounded text-gray-700 hover:bg-gray-100" id="closeWaitBtn">Close</button>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.querySelector("#closeWaitBtn").onclick = () => overlay.remove();
+    }
+
+    // Kick things off
+    loadBookings();
+  </script>
+</body>
+</html>
