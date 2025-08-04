@@ -23,8 +23,37 @@
     .hover\:bg-maroon-dark:hover { background-color: #660000; }
     .text-maroon { color: #800000; }
     .border-maroon { border-color: #800000; }
-    .bg-yellow-brand { background-color: #FFD600; }
-    .text-yellow-brand { color: #FFD600; }
+    .bg-yellow-brand { background-color: #BFA600; } /* Darker yellow */
+    .text-yellow-brand { color: #BFA600; }
+    /* Tooltip styles */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 220px;
+      background-color: rgba(255,255,255,0.95); /* transparent white */
+      color: #1e3a8a; /* dark blue */
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px 12px;
+      position: absolute;
+      z-index: 10;
+      bottom: 120%;
+      left: 50%;
+      margin-left: -110px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      font-size: 1em;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(30,58,138,0.08);
+      border: 1px solid #dbeafe;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -33,9 +62,9 @@
     <header class="mb-6 relative">
       <div class="text-center">
         <h1 class="text-3xl md:text-4xl font-bold text-blue-800">
-          Book a Time with Mr. Albert
+          Discovery Room Booking
         </h1>
-        <p class="text-gray-600">EdTech Teacher | BINUS School Simprug</p>
+        <p class="text-gray-600">EdTech Teacher Mr. Albert BINUS School Simprug</p>
       </div>
       <img
         src="./images/simprug.png"
@@ -166,7 +195,7 @@
         <input
           id="studentEmail"
           type="email"
-          placeholder="Enter your email"
+          placeholder="Binusian email here."
           class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -325,6 +354,12 @@
       }
     }
 
+    // Helper: format date as DD/MM/YY
+    function formatDateDDMMYY(dateStr) {
+      const [y, m, d] = dateStr.split("-");
+      return `${d}/${m}/${y.slice(2)}`;
+    }
+
     // Render slots for all selected dates
     function renderSlots(dates){
       slotsEl.innerHTML = "";
@@ -335,20 +370,40 @@
         const col = document.createElement("div");
         col.className = "bg-gray-50 rounded-lg p-4";
         const hdr = document.createElement("h3");
-        hdr.textContent = `${weekday} — ${dateStr}`;
+        hdr.textContent = `${weekday} — ${formatDateDDMMYY(dateStr)}`;
         hdr.className = "font-semibold text-lg text-gray-800 mb-3 border-b pb-2";
         col.appendChild(hdr);
         const list = document.createElement("div");
         list.className = "space-y-2";
         times.forEach(time => {
-          const btn = document.createElement("button");
-          const booked = bookedTimes.has(`${dateStr}|${time}`);
-          btn.textContent = `${time} ${booked? "(Booked)" : "(Available)"}`;
-          btn.disabled = booked;
-          btn.className = `w-full px-3 py-2 rounded border text-white font-medium ${
-            booked ? "bg-red-500" : "bg-green-500 hover:bg-green-600"
-          }`;
-          if(!booked) btn.onclick = () => openModal(dateStr, time);
+          const bookedKey = `${dateStr}|${time}`;
+          const booked = bookedTimes.has(bookedKey);
+          let btn;
+          if (booked) {
+            // Find booking details for tooltip
+            const b = bookedDetails.find(bd => bd.date === dateStr && bd.time === time);
+            btn = document.createElement("div");
+            btn.className = "tooltip";
+            const button = document.createElement("button");
+            button.textContent = `${time} (Booked)`;
+            button.disabled = true;
+            button.className = "w-full px-3 py-2 rounded border text-white font-medium bg-red-500 cursor-not-allowed";
+            btn.appendChild(button);
+            // Tooltip content: transparent white, dark blue, only teacher name and time
+            const tip = document.createElement("span");
+            tip.className = "tooltiptext";
+            tip.innerHTML = b
+              ? `<div><span class="font-bold">Teacher:</span> <span>${b.studentName}</span></div>
+                 <div><span class="font-bold">Time:</span> <span>${b.time}</span></div>`
+              : "";
+            btn.appendChild(tip);
+          } else {
+            btn = document.createElement("button");
+            btn.textContent = `${time} (Available)`;
+            btn.disabled = false;
+            btn.className = "w-full px-3 py-2 rounded border text-white font-medium bg-green-500 hover:bg-green-600";
+            btn.onclick = () => openModal(dateStr, time);
+          }
           list.appendChild(btn);
         });
         col.appendChild(list);
@@ -369,7 +424,7 @@
       });
       bookedPreview.innerHTML = bookedDetails.map(b=>
         `<li class="border-l-4 border-blue-400 pl-2 py-1 bg-white rounded">
-          <span class="font-semibold text-blue-800">${b.date}</span>
+          <span class="font-semibold text-blue-800">${formatDateDDMMYY(b.date)}</span>
           <span class="ml-2 text-gray-700">${b.time}</span>
           <div class="text-xs text-gray-500">${b.studentName} (${b.studentClass})</div>
         </li>`
@@ -380,7 +435,7 @@
     function openModal(date, time){
       selDate = date;
       selTime = time;
-      slotInfoEl.textContent = `${selDate} @ ${selTime}`;
+      slotInfoEl.textContent = `${formatDateDDMMYY(selDate)} @ ${selTime}`;
       modalEl.classList.replace("hidden","flex");
     }
 
@@ -391,6 +446,10 @@
       classInput.value = "";
       emailInput.value = "";
     }
+
+    // --- Make cancel and close buttons work ---
+    closeBtn.addEventListener("click", closeModal);
+    cancelBtn.addEventListener("click", closeModal);
 
     // Add: Helper to create ICS file content
     function createICS({date, time, name, cls, email}) {
@@ -479,7 +538,7 @@ END:VCALENDAR`;
           <h2 class="text-2xl font-bold text-green-600 mb-2">Booking Confirmed!</h2>
           <div class="mb-3 text-left">
             <div class="font-semibold text-blue-800">Date:</div>
-            <div>${date}</div>
+            <div>${formatDateDDMMYY(date)}</div>
             <div class="font-semibold text-blue-800 mt-2">Time:</div>
             <div>${time}</div>
             <div class="font-semibold text-blue-800 mt-2">Name:</div>
@@ -560,7 +619,7 @@ END:VCALENDAR`;
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full fade-in">
           <h3 class="text-xl font-semibold text-gray-800 mb-2">Slot Already Booked</h3>
           <p class="mb-2 text-gray-600">Would you like to join the waiting list for:</p>
-          <div class="mb-2 text-maroon font-semibold">${date} @ ${time}</div>
+          <div class="mb-2 text-maroon font-semibold">${formatDateDDMMYY(date)} @ ${time}</div>
           <form id="waitingForm" class="space-y-3">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
@@ -575,6 +634,7 @@ END:VCALENDAR`;
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Your Email</label>
               <input type="email" id="waitEmail" value="${email||""}" required
+                placeholder="Binusian email here."
                 class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
             </div>
             <div class="flex flex-col sm:flex-row sm:justify-end gap-3 mt-4">
@@ -629,7 +689,7 @@ END:VCALENDAR`;
           <h2 class="text-2xl font-bold text-blue-600 mb-2">Added to Waiting List!</h2>
           <div class="mb-3 text-left">
             <div class="font-semibold text-blue-800">Date:</div>
-            <div>${date}</div>
+            <div>${formatDateDDMMYY(date)}</div>
             <div class="font-semibold text-blue-800 mt-2">Time:</div>
             <div>${time}</div>
             <div class="font-semibold text-blue-800 mt-2">Name:</div>
@@ -649,5 +709,9 @@ END:VCALENDAR`;
     // Kick things off
     loadBookings();
   </script>
+  <!-- Footnote -->
+  <footer class="text-center text-xs text-gray-500 mt-10 mb-2">
+    Created by Mr. Albert
+  </footer>
 </body>
 </html>
