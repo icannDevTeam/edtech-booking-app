@@ -14,10 +14,6 @@ const SibApiV3Sdk = require('sib-api-v3-sdk');
 const {setGlobalOptions} = require("firebase-functions");
 const {onRequest} = require("firebase-functions/https");
 const logger = require("firebase-functions/logger");
-const {onSchedule} = require("firebase-functions/v2/scheduler");
-const {getFirestore} = require("firebase-admin/firestore");
-const admin = require("firebase-admin");
-if (!admin.apps.length) admin.initializeApp();
 
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
@@ -41,7 +37,7 @@ exports.sendTestEmail = onRequest(async (req, res) => {
   try {
     const sendSmtpEmail = {
       to: [{ email: req.body.to || 'your@email.com', name: req.body.name || 'Test User' }],
-      sender: { email: 'arthurapp05@gmail.com', name: 'Discovery Room Booking' },
+      sender: { email: 'arthurapp05@gmail.com', name: 'Your Name' },
       subject: 'Test Email from Firebase Function',
       htmlContent: '<h1>Hello from Firebase & Brevo!</h1><p>This is a test email.</p>'
     };
@@ -68,10 +64,10 @@ exports.sendBookingEmail = onDocumentCreated("bookings/{bookingId}", async (even
 
     const sendSmtpEmail = {
       to: [{ email: data.studentEmail, name: data.studentName || 'Student' }],
-      sender: { email: 'arthurapp05@gmail.com', name: 'Discovery Room Booking' },
-      subject: 'Your Discovery Room Booking is confirmed!',
+      sender: { email: 'arthurapp05@gmail.com', name: 'Your Name' },
+      subject: 'Your Booking is Confirmed!',
       htmlContent: `
-        <h1>Your Discovery Room Booking is confirmed.</h1>
+        <h1>Booking Confirmed</h1>
         <p>Hi ${data.studentName || ''},</p>
         <p>Your booking for ${data.date} at ${data.time} is confirmed!</p>
         <p>At BINUS, we value:</p>
@@ -89,40 +85,6 @@ exports.sendBookingEmail = onDocumentCreated("bookings/{bookingId}", async (even
   } catch (err) {
     logger.error('Failed to send booking email', err);
   }
-});
-
-// Scheduled function: send daily summary of all bookings
-exports.sendDailyBookingSummary = onSchedule({
-  schedule: 'every day 08:00', // 8 AM UTC daily
-  timeZone: 'Asia/Jakarta',
-}, async (event) => {
-  const db = getFirestore();
-  const snapshot = await db.collection('bookings').get();
-  if (snapshot.empty) return;
-
-  let rows = '';
-  snapshot.forEach(doc => {
-    const d = doc.data();
-    rows += `<tr><td>${d.studentName || ''}</td><td>${d.studentEmail || ''}</td><td>${d.date || ''}</td><td>${d.time || ''}</td></tr>`;
-  });
-
-  const htmlTable = `
-    <h2>Discovery Room Booking - Daily Summary</h2>
-    <table border="1" cellpadding="5" cellspacing="0">
-      <thead>
-        <tr><th>Name</th><th>Email</th><th>Date</th><th>Time</th></tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-  `;
-
-  const sendSmtpEmail = {
-    to: [{ email: 'albert.arthur@binus.edu', name: 'Albert Arthur' }],
-    sender: { email: 'arthurapp05@gmail.com', name: 'Discovery Room Booking' },
-    subject: 'Daily Discovery Room Booking Summary',
-    htmlContent: htmlTable
-  };
-  await emailApi.sendTransacEmail(sendSmtpEmail);
 });
 
 // Create and deploy your first functions
