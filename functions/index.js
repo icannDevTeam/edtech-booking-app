@@ -7,29 +7,20 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+const { onRequest } = require("firebase-functions/v2/https");
 
-require('dotenv').config();         // ← load .env into process.env
+
+require('dotenv').config();
 const functions   = require('firebase-functions');
+const admin = require('firebase-admin');
 const SibApiV3Sdk = require('sib-api-v3-sdk');
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+admin.initializeApp();
+const db = admin.firestore();
 
-// --- Brevo (Sendinblue) Email Setup ---
+// Set up Brevo (Sendinblue)
 const client = SibApiV3Sdk.ApiClient.instance;
-client.authentications['api-key'].apiKey = process.env.SENDINBLUE_KEY;
+client.authentications['api-key'].apiKey = process.env.BREVO_KEY;
 const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // Minimal test endpoint to send an email
@@ -85,6 +76,51 @@ exports.sendBookingEmail = onDocumentCreated("bookings/{bookingId}", async (even
   } catch (err) {
     logger.error('Failed to send booking email', err);
   }
+});
+
+// Request access function
+exports.requestAccess = functions.https.onRequest(async (req, res) => {
+  if (req.method !== 'POST') {
+    res.status(405).send({ message: 'Method not allowed' });
+    return;
+  }
+  const { email } = req.body;
+  if (!email || !email.endsWith('@binus.edu')) {
+    res.status(400).send({ message: 'Only BINUSIAN emails allowed.' });
+    return;
+  }
+  // Check if user already exists
+  const teachersRef = db.collection('teachers');
+  const existing = await teachersRef.where('email', '==', email).get();
+  if (!existing.empty) {
+    res.status(409).send({ message: 'User already exists. Please login.' });
+    return;
+  }
+  // Generate password
+  const password = Math.random().toString(36).slice(-10);
+  // Store user in Firestore
+  await teachersRef.add({
+    email,
+    password,
+    createdAt: new Date().toISOString(),
+  });
+  // Send password email
+  await emailApi.sendTransacEmail({
+    to: [{ email }],
+    sender: { email: process.env.BREVO_SENDER, name: 'EdTech Booking' },
+    subject: 'Your Access Request',
+    htmlContent: `
+      <h1>Access Request Received</h1>
+      <p>Hi there,</p>
+      <p>Thank you for your interest in EdTech Booking. Your access request has been received.</p>
+      <p>Please use the following credentials to log in:</p>
+      <p>Email: ${email}</p>
+      <p>Password: ${password}</p>
+      <p>We recommend that you change your password after your first login.</p>
+      <p>Best regards,<br/>The EdTech Booking Team</p>
+    `
+  });
+  res.status(200).send({ message: 'Access requested successfully. Please check your email.' });
 });
 
 // Create and deploy your first functions
