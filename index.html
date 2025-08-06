@@ -1038,10 +1038,37 @@ END:VCALENDAR`;
     // Kick things off
     loadBookings();
   </script>
-  <!-- Footnote -->
-  <footer class="text-center text-xs text-gray-500 mt-10 mb-2">
-    Created by Mr. Albert<br>
-    <span class="text-xs text-blue-700">Admin: To approve teachers, go to your Firebase Firestore, create a 'teachers' collection, add a document for each teacher with fields: 'email' (string, must match their login email), 'approved' (boolean, set to true to approve). Teachers will see 'Pending Approval' until you set 'approved' to true.</span>
+  <!-- Binus Spirit Values Animation (no dividing line) -->
+  <div class="w-full overflow-hidden bg-blue-950 py-3 mt-10 mb-2 relative">
+    <div id="spiritValuesBar" class="absolute whitespace-nowrap text-yellow-300 text-lg font-bold flex items-center animate-spirit-scroll" style="will-change: transform; left:100%;">
+      <span class="px-8">S - Striving for Excellence</span>
+      <span class="px-8">P - Perseverance</span>
+      <span class="px-8">I - Integrity</span>
+      <span class="px-8">R - Respect</span>
+      <span class="px-8">I - Innovation</span>
+      <span class="px-8">T - Teamwork</span>
+    </div>
+    <style>
+      @keyframes spirit-scroll {
+        0%   { left: 100%; }
+        100% { left: -100%; }
+      }
+      .animate-spirit-scroll {
+        animation: spirit-scroll 30s linear infinite;
+      }
+    </style>
+  </div>
+
+  <!-- Footer Quick Links (Simprug only) -->
+  <footer class="bg-blue-950 text-yellow-100 py-6 mt-0">
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 px-6">
+      <div class="flex flex-col md:flex-row gap-6 items-center">
+        <a href="https://school.binus.sch.id/simprug/" target="_blank" class="hover:text-yellow-400 font-semibold">BINUS School Simprug</a>
+        <a href="teacher-portal.html" class="hover:text-yellow-400 font-semibold">Teacher Portal</a>
+        <a href="mailto:albert.arthur@binus.edu" class="hover:text-yellow-400 font-semibold">Contact Mr. Albert</a>
+      </div>
+      <div class="text-xs text-yellow-300 mt-2 md:mt-0">&copy; 2025 BINUS School Simprug EdTech Booking</div>
+    </div>
   </footer>
 </body>
 </html>
