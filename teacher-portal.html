@@ -146,18 +146,16 @@
       <div id="signUpStatus" class="text-sm text-center mt-2"></div>
     </div>
   </div>
-    // Show Sign Up Modal
+    // Sign Up Modal Logic
     document.getElementById('signUpLink').onclick = function(e) {
       e.preventDefault();
       document.getElementById('signUpModal').classList.remove('hidden');
       document.getElementById('signUpModal').classList.add('flex');
     };
-    // Hide Sign Up Modal
     document.getElementById('cancelSignUpBtn').onclick = function() {
       document.getElementById('signUpModal').classList.remove('flex');
       document.getElementById('signUpModal').classList.add('hidden');
     };
-    // Handle Sign Up Form Submission
     document.getElementById('signUpForm').onsubmit = async function(e) {
       e.preventDefault();
       const name = document.getElementById('signUpName').value.trim();
@@ -170,7 +168,6 @@
         return;
       }
       try {
-        // Save to Firestore (teachers collection)
         await firebase.firestore().collection('teachers').add({
           name, email, subject, createdAt: new Date().toISOString(), status: 'pending'
         });
