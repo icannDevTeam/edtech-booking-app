@@ -211,6 +211,19 @@
   <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
   <script>
+    // Firebase config (same as index.html)
+    const firebaseConfig = {
+      apiKey:    "AIzaSyBKhgPEWHqW36Xg0Bx6qwsXq9Hnew0094o",
+      authDomain:"school-booking-platform.firebaseapp.com",
+      projectId: "school-booking-platform",
+      storageBucket: "school-booking-platform.appspot.com",
+      messagingSenderId:"673281572597",
+      appId:     "1:673281572597:web:fe0ceec0054560f6258fbc",
+      measurementId:"G-TVQ5PK5WZF"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  <script>
     // This would be connected to your actual Firebase implementation
     document.getElementById('emailLogin').addEventListener('click', function() {
       // Simulate login
