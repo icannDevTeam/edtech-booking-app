@@ -252,38 +252,75 @@
     firebase.initializeApp(firebaseConfig);
   </script>
   <script>
-    // This would be connected to your actual Firebase implementation
-    document.getElementById('emailLogin').addEventListener('click', function() {
-      // Simulate login
-      document.getElementById('authSection').classList.add('hidden');
-      document.getElementById('portalSection').classList.remove('hidden');
-    });
-    
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-      // Simulate logout
-      document.getElementById('authSection').classList.remove('hidden');
-      document.getElementById('portalSection').classList.add('hidden');
-    });
-    
-    // Google Sign-In
-    document.getElementById('googleSignInBtn').addEventListener('click', async function() {
-      const statusDiv = document.getElementById('requestStatus');
-      statusDiv.textContent = 'Signing in with Google...';
-      statusDiv.className = 'text-sm text-center mt-1 text-blue-600';
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        const result = await firebase.auth().signInWithPopup(provider);
-        const user = result.user;
-        if (user && user.email) {
-          statusDiv.textContent = 'Sign-in successful!';
-          statusDiv.className = 'text-sm text-center mt-1 text-green-600';
-          document.getElementById('authSection').classList.add('hidden');
-          document.getElementById('portalSection').classList.remove('hidden');
+    document.addEventListener('DOMContentLoaded', function() {
+      // Google Sign-In
+      document.getElementById('googleSignInBtn').addEventListener('click', async function() {
+        const statusDiv = document.getElementById('requestStatus');
+        statusDiv.textContent = 'Signing in with Google...';
+        statusDiv.className = 'text-sm text-center mt-1 text-blue-600';
+        const provider = new firebase.auth.GoogleAuthProvider();
+        try {
+          const result = await firebase.auth().signInWithPopup(provider);
+          const user = result.user;
+          if (user && user.email) {
+            // Check Firestore for teacher approval
+            const teachersRef = firebase.firestore().collection('teachers');
+            const snapshot = await teachersRef.where('email', '==', user.email.toLowerCase()).get();
+            if (!snapshot.empty) {
+              const teacherDoc = snapshot.docs[0].data();
+              if (teacherDoc.status === 'approved') {
+                statusDiv.textContent = 'Sign-in successful!';
+                statusDiv.className = 'text-sm text-center mt-1 text-green-600';
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('portalSection').classList.remove('hidden');
+              } else {
+                statusDiv.textContent = 'Your account is pending approval. Please wait for admin approval.';
+                statusDiv.className = 'text-sm text-center mt-1 text-yellow-600';
+              }
+            } else {
+              statusDiv.textContent = 'No teacher account found for this email. Please sign up first.';
+              statusDiv.className = 'text-sm text-center mt-1 text-red-600';
+            }
+          }
+        } catch (err) {
+          statusDiv.textContent = 'Google sign-in failed.';
+          statusDiv.className = 'text-sm text-center mt-1 text-accent-600';
         }
-      } catch (err) {
-        statusDiv.textContent = 'Google sign-in failed.';
-        statusDiv.className = 'text-sm text-center mt-1 text-accent-600';
-      }
+      });
+
+      // Sign Up Modal Logic
+      document.getElementById('signUpLink').onclick = function(e) {
+        e.preventDefault();
+        document.getElementById('signUpModal').classList.remove('hidden');
+        document.getElementById('signUpModal').classList.add('flex');
+      };
+      document.getElementById('cancelSignUpBtn').onclick = function() {
+        document.getElementById('signUpModal').classList.remove('flex');
+        document.getElementById('signUpModal').classList.add('hidden');
+      };
+      document.getElementById('signUpForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('signUpName').value.trim();
+        const email = document.getElementById('signUpEmail').value.trim().toLowerCase();
+        const subject = document.getElementById('signUpSubject').value.trim();
+        const statusDiv = document.getElementById('signUpStatus');
+        if(!name || !email || !subject) {
+          statusDiv.textContent = 'All fields are required.';
+          statusDiv.className = 'text-red-600';
+          return;
+        }
+        try {
+          await firebase.firestore().collection('teachers').add({
+            name, email, subject, createdAt: new Date().toISOString(), status: 'pending'
+          });
+          statusDiv.textContent = 'Sign-up request submitted! You will be notified once approved.';
+          statusDiv.className = 'text-green-600';
+          document.getElementById('signUpForm').reset();
+        } catch (err) {
+          statusDiv.textContent = 'Failed to submit sign-up. Please try again.';
+          statusDiv.className = 'text-red-600';
+        }
+      };
     });
   </script>
 </body>
