@@ -57,105 +57,132 @@
   </style>
 </head>
 <body class="bg-blue-900 min-h-screen">
-  <div class="container mx-auto px-4 py-6 max-w-6xl relative">
-    <!-- Teacher Portal Button Top Left -->
-    <div class="absolute top-6 left-6 z-20">
-      <a href="teacher-portal.html" class="inline-flex items-center px-5 py-2.5 bg-white text-blue-800 font-semibold rounded-full shadow-lg border-2 border-blue-800 transition-colors duration-200 hover:text-maroon focus:outline-none focus:ring-2 focus:ring-blue-200">
-        <i class="fas fa-chalkboard-teacher mr-2"></i>
-        Teacher Portal
-      </a>
-    </div>
-    <!-- Header -->
-    <header class="mb-6 relative">
-      <div class="text-center">
-        <h1 class="text-3xl md:text-4xl font-bold text-yellow-200 drop-shadow">
-          Discovery Room Booking
-        </h1>
-        <p class="text-yellow-100">EdTech Teacher Mr. Albert BINUS School Simprug</p>
+  <!-- Header Section: Teacher Portal (top left), Logo & Auth (top right), Centered Heading -->
+  <div class="container mx-auto px-6 max-w-6xl relative">
+    <header class="relative flex flex-col items-center justify-center mb-6" style="min-height:120px;">
+      <!-- Teacher Portal Top Left -->
+      <div id="teacherPortalBtn" class="absolute top-8 left-0 z-20">
+        <a id="teacherPortalLink" href="teacher-portal.html" class="inline-flex items-center px-6 py-3 bg-white text-blue-800 font-semibold rounded-full shadow-lg border-2 border-blue-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-200 ml-2 cursor-not-allowed opacity-60" tabindex="-1" aria-disabled="true">
+          <i class="fas fa-chalkboard-teacher mr-2"></i>
+          Teacher Portal
+        </a>
       </div>
-      <img
-        src="./images/simprug.png"
-        alt="BINUS School Logo"
-        class="absolute top-0 right-0 h-16 w-auto"
-      />
+      <!-- Logo & Auth Top Right -->
+      <div class="absolute top-0 right-0 flex flex-col items-end z-20">
+        <img src="./images/simprug.png" alt="BINUS School Logo" class="h-20 w-auto mt-4 mr-2" />
+        <div id="authBar" class="flex flex-col items-end gap-2 mt-2 mr-8"></div>
+      </div>
+      <!-- Centered Heading -->
+      <div class="w-full flex flex-col items-center justify-center pt-8">
+        <h1 class="text-4xl md:text-5xl font-bold text-yellow-200 drop-shadow mb-1 text-center">Discovery Room Booking</h1>
+        <p class="text-yellow-100 text-lg text-center">EdTech Teacher Mr. Albert BINUS School Simprug</p>
+      </div>
     </header>
+  </div>
+  <!-- Sign-Up/Sign-In Modal -->
+  <div id="authModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" style="display:none;">
+    <div id="authModalContent" class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full fade-in">
+      <h2 class="text-2xl font-bold text-blue-800 mb-4">Welcome! Please Sign Up / Sign In</h2>
+      <form id="authForm" class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+          <input type="text" id="authName" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input type="email" id="authEmail" required placeholder="Binusian email here." class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+          <select id="authRole" required class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="">Select role</option>
+            <option value="teacher">Teacher</option>
+            <option value="staff">Staff</option>
+          </select>
+        </div>
+        <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition">Sign Up / Sign In</button>
+      </form>
+    </div>
+  </div>
+  <div class="container mx-auto px-6 py-8 max-w-6xl relative" id="mainContent">
+    <!-- ...existing code... -->
 
     <!-- Banner -->
-    <section class="mb-8">
+    <section class="mb-10">
       <img
         src="./images/Albert_motion.jpg"
         alt="Goofy Banner"
-        class="w-full h-64 object-cover rounded-lg shadow-md"
+        class="w-full h-72 object-cover rounded-xl shadow-xl border-4 border-yellow-200"
       />
     </section>
 
     <!-- Booking Calendar -->
-    <section class="bg-white rounded-lg shadow-md p-6 border border-gray-200 mb-10">
-      <h2 class="flex items-center text-xl font-semibold text-gray-800 mb-6">
-        <i class="fas fa-calendar-alt text-blue-500 mr-2"></i>
+    <section class="bg-white rounded-xl shadow-xl p-8 border border-gray-200 mb-12">
+      <h2 class="flex items-center text-2xl font-bold text-gray-800 mb-8">
+        <i class="fas fa-calendar-alt text-blue-500 mr-3"></i>
         Pick Your Date & Slot
       </h2>
       <!-- Date Range Picker -->
-      <div class="flex flex-col md:flex-row gap-4 mb-4">
+      <div class="flex flex-col md:flex-row gap-6 mb-6">
         <div class="flex-1">
-          <label for="bookingDate" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="bookingDate" class="block text-base font-medium text-gray-700 mb-2">
             Select a date (single)
           </label>
           <input
             type="date"
             id="bookingDate"
-            class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
+          <label class="block text-base font-medium text-gray-700 mb-2">
             Or pick a date range
           </label>
-          <div class="flex gap-2">
+          <div class="flex gap-3">
             <input
               type="date"
               id="rangeStart"
-              class="flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              class="flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
             />
             <span class="self-center">to</span>
             <input
               type="date"
               id="rangeEnd"
-              class="flex-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+              class="flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
       </div>
-      <div class="flex flex-col lg:flex-row gap-8">
+      <div class="flex flex-col lg:flex-row gap-10">
         <div class="flex-1">
-          <p id="loading" class="text-center text-gray-500 mb-4 hidden">Loading slots…</p>
+          <p id="loading" class="text-center text-gray-500 mb-6 hidden">Loading slots…</p>
           <div
             id="slotsContainer"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-4"
+            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-6"
           ></div>
         </div>
         <!-- Booked Slots Preview -->
-        <aside class="w-full lg:w-72 bg-gray-50 border border-gray-200 rounded-lg p-4 booked-scroll">
-          <h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center">
-            <i class="fas fa-list mr-2"></i>Booked Slots
+        <aside class="w-full lg:w-80 bg-gray-50 border border-gray-200 rounded-xl p-6 booked-scroll">
+          <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center">
+            <i class="fas fa-list mr-3"></i>Booked Slots
           </h3>
-          <ul id="bookedPreview" class="space-y-2 text-sm"></ul>
+          <ul id="bookedPreview" class="space-y-3 text-base"></ul>
         </aside>
       </div>
     </section>
 
     <!-- Gallery -->
-    <section class="mb-10">
-      <h2 class="text-2xl font-semibold text-center text-yellow-200 mb-6">
+    <section class="mb-12">
+      <h2 class="text-3xl font-bold text-center text-yellow-200 mb-8">
         Life in Our EdTech Class
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <img src="./images/Grade1.jpg" alt="Grade 1" class="h-60 w-full object-cover rounded-lg shadow-lg" />
-        <img src="./images/My_gys.jpg" alt="Fun Activity" class="h-60 w-full object-cover rounded-lg shadow-lg" />
-        <img src="./images/Space.jpg" alt="Space Learning" class="h-60 w-full object-cover rounded-lg shadow-lg" />
-        <img src="./images/Girlsclub.jpg" alt="Girls Club" class="h-60 w-full object-cover rounded-lg shadow-lg" />
-        <img src="./images/Madeit.jpg" alt="Project Success" class="h-60 w-full object-cover rounded-lg shadow-lg" />
-        <img src="./images/Coding.jpg" alt="Coding Time" class="h-60 w-full object-cover rounded-lg shadow-lg" />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <img src="./images/Grade1.jpg" alt="Grade 1" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/My_gys.jpg" alt="Fun Activity" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Space.jpg" alt="Space Learning" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Girlsclub.jpg" alt="Girls Club" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Madeit.jpg" alt="Project Success" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Coding.jpg" alt="Coding Time" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
       </div>
     </section>
   </div>
@@ -224,6 +251,267 @@
 
   <!-- Booking Logic -->
   <script type="module">
+    // --- Auth Bar Logic ---
+    const authBar = document.getElementById("authBar");
+    function renderAuthBar() {
+      const user = getUser();
+      authBar.innerHTML = "";
+      const teacherPortalBtn = document.getElementById("teacherPortalBtn");
+      const teacherPortalLink = document.getElementById("teacherPortalLink");
+      if (user && user.name) {
+        // Only enable Teacher Portal if approved
+        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs}) => {
+          const db = getFirestore();
+          const usersCol = collection(db, "users");
+          const q = query(usersCol, where("email", "==", user.email));
+          const snap = await getDocs(q);
+          let userDoc = null;
+          snap.forEach(doc => userDoc = doc);
+          if (userDoc && userDoc.data().approved) {
+            teacherPortalLink.classList.remove("cursor-not-allowed", "opacity-60");
+            teacherPortalLink.setAttribute("tabindex", "0");
+            teacherPortalLink.removeAttribute("aria-disabled");
+            teacherPortalLink.onclick = null; // allow navigation
+          } else {
+            teacherPortalLink.classList.add("cursor-not-allowed", "opacity-60");
+            teacherPortalLink.setAttribute("tabindex", "-1");
+            teacherPortalLink.setAttribute("aria-disabled", "true");
+            teacherPortalLink.onclick = (e) => { e.preventDefault(); };
+          }
+        });
+        // Auth bar only shows user info and logout
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "text-white font-semibold px-3 py-1 rounded bg-blue-800";
+        nameSpan.textContent = `Hello, ${user.name}`;
+        const logoutBtn = document.createElement("button");
+        logoutBtn.className = "px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition";
+        logoutBtn.textContent = "Logout";
+        logoutBtn.onclick = () => {
+          localStorage.removeItem("edtechUser");
+          teacherPortalLink.classList.add("cursor-not-allowed", "opacity-60");
+          teacherPortalLink.setAttribute("tabindex", "-1");
+          teacherPortalLink.setAttribute("aria-disabled", "true");
+          teacherPortalLink.onclick = (e) => { e.preventDefault(); };
+          renderAuthBar();
+        };
+        authBar.appendChild(nameSpan);
+        authBar.appendChild(logoutBtn);
+      } else {
+        // Auth bar only shows main Sign Up / Sign In, never Teacher Portal login
+        teacherPortalLink.classList.add("cursor-not-allowed", "opacity-60");
+        teacherPortalLink.setAttribute("tabindex", "-1");
+        teacherPortalLink.setAttribute("aria-disabled", "true");
+        teacherPortalLink.onclick = (e) => { e.preventDefault(); };
+        // Horizontal flex container for links
+        const linkBar = document.createElement("div");
+        linkBar.className = "flex gap-4 mt-2";
+
+        // Login link
+        const loginLink = document.createElement("a");
+        loginLink.href = "#";
+        loginLink.className = "text-blue-400 underline text-base font-semibold hover:text-yellow-200 transition";
+        loginLink.textContent = "Login";
+        loginLink.onclick = (e) => {
+          e.preventDefault();
+          showRoleLoginModal("teacher");
+        };
+        linkBar.appendChild(loginLink);
+
+        // Sign Up link
+        const signupLink = document.createElement("a");
+        signupLink.href = "#";
+        signupLink.className = "text-green-400 underline text-base font-semibold hover:text-yellow-200 transition";
+        signupLink.textContent = "Sign Up";
+        signupLink.onclick = (e) => {
+          e.preventDefault();
+          showAuthModal();
+        };
+        linkBar.appendChild(signupLink);
+
+        authBar.appendChild(linkBar);
+        // Ensure Teacher Portal never opens auth modal
+        teacherPortalLink.onclick = (e) => { e.preventDefault(); };
+    // --- Role Login Modal Logic ---
+    function showRoleLoginModal(role) {
+      // Remove any existing modal
+      let old = document.getElementById("roleLoginModal");
+      if (old) old.remove();
+      const modal = document.createElement("div");
+      modal.id = "roleLoginModal";
+      modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
+      let color = role === "teacher" ? "bg-maroon text-white" : "bg-blue-800 text-white";
+      let title = role === "teacher" ? "Teacher Login" : "Staff Login";
+      modal.innerHTML = `
+        <div class="${color} p-8 rounded-xl shadow-2xl max-w-md w-full fade-in">
+          <h2 class="text-2xl font-bold mb-4">${title}</h2>
+          <form id="roleLoginForm" class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium mb-2">Name</label>
+              <input type="text" id="roleLoginName" required class="w-full px-4 py-3 border rounded-lg text-black" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Email</label>
+              <input type="email" id="roleLoginEmail" required class="w-full px-4 py-3 border rounded-lg text-black" />
+            </div>
+            <button type="submit" class="w-full px-6 py-3 bg-yellow-500 text-maroon rounded-lg font-semibold shadow hover:bg-yellow-600 transition">Login</button>
+          </form>
+          <button id="closeRoleLoginBtn" class="mt-6 px-4 py-2 border rounded text-white hover:bg-gray-100 hover:text-black">Close</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      modal.querySelector("#closeRoleLoginBtn").onclick = () => modal.remove();
+      modal.querySelector("#roleLoginForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const name = modal.querySelector("#roleLoginName").value.trim();
+        const email = modal.querySelector("#roleLoginEmail").value.trim().toLowerCase();
+        if (!name || !email) {
+          alert("All fields are required.");
+          return;
+        }
+        if (!email.endsWith("@binus.edu") && !email.endsWith("@binus.org")) {
+          alert("Use your school email (@binus.edu or @binus.org)." );
+          return;
+        }
+        // Check if user exists and approved
+        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs, addDoc}) => {
+          const db = getFirestore();
+          const usersCol = collection(db, "users");
+          const q = query(usersCol, where("email", "==", email), where("role", "==", role));
+          const snap = await getDocs(q);
+          let userDoc = null;
+          snap.forEach(doc => userDoc = doc);
+          if (!userDoc) {
+            alert("No account found. Please sign up first.");
+            return;
+          }
+          const userData = userDoc.data();
+          if (!userData.approved) {
+            alert("Your account is pending approval. Please wait for admin confirmation.");
+            return;
+          }
+          // Approved: log in
+          setUser({ name: userData.name, email: userData.email, role: userData.role, id: userDoc.id });
+          modal.remove();
+          renderAuthBar();
+          setTimeout(() => {
+            if (!document.getElementById("welcomeMsg")) {
+              const msg = document.createElement("div");
+              msg.id = "welcomeMsg";
+              msg.className = "fixed top-4 right-4 bg-blue-800 text-white px-4 py-2 rounded shadow-lg z-50 fade-in";
+              msg.textContent = `Welcome, ${userData.name}!`;
+              document.body.appendChild(msg);
+              setTimeout(()=>msg.remove(), 3500);
+            }
+          }, 500);
+        });
+      };
+    }
+      }
+    }
+    renderAuthBar();
+    // --- Auth Modal Logic ---
+    const authModal = document.getElementById("authModal");
+    const authForm = document.getElementById("authForm");
+    const authName = document.getElementById("authName");
+    const authEmail = document.getElementById("authEmail");
+    const authRole = document.getElementById("authRole");
+    const mainContent = document.getElementById("mainContent");
+    // Booking calendar DOM refs
+    const dateInput = document.getElementById("bookingDate");
+    const rangeStart = document.getElementById("rangeStart");
+    const rangeEnd = document.getElementById("rangeEnd");
+    const slotsEl = document.getElementById("slotsContainer");
+    const bookedPreview = document.getElementById("bookedPreview");
+    const loadingEl = document.getElementById("loading");
+    // Modal refs
+    const modalEl = document.getElementById("bookingModal");
+    const slotInfoEl = document.getElementById("slotInfo");
+    const nameInput = document.getElementById("studentName");
+    const classInput = document.getElementById("studentClass");
+    const emailInput = document.getElementById("studentEmail");
+    const closeBtn = document.getElementById("closeModalBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const confirmBtn = document.getElementById("confirmBtn");
+
+    function showAuthModal() {
+      authModal.style.display = "flex";
+      setTimeout(() => {
+        // Add click outside to close
+        function outsideClick(e) {
+          const modalContent = document.getElementById("authModalContent");
+          if (authModal.style.display === "flex" && modalContent && !modalContent.contains(e.target)) {
+            hideAuthModal();
+            document.removeEventListener("mousedown", outsideClick);
+          }
+        }
+        document.addEventListener("mousedown", outsideClick);
+      }, 100);
+    }
+    function hideAuthModal() {
+      authModal.style.display = "none";
+    }
+    function getUser() {
+      try {
+        return JSON.parse(localStorage.getItem("edtechUser"));
+      } catch { return null; }
+    }
+    function setUser(user) {
+      localStorage.setItem("edtechUser", JSON.stringify(user));
+    }
+    authForm.onsubmit = function(e) {
+      e.preventDefault();
+      const name = authName.value.trim();
+      const email = authEmail.value.trim().toLowerCase();
+      const role = authRole.value;
+      if (!name || !email || !role) {
+        alert("All fields are required.");
+        return;
+      }
+      if (!email.endsWith("@binus.edu") && !email.endsWith("@binus.org")) {
+        alert("Use your school email (@binus.edu or @binus.org)." );
+        return;
+      }
+      // Check if user exists and approved
+      import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs, addDoc}) => {
+        const db = getFirestore();
+        const usersCol = collection(db, "users");
+        const q = query(usersCol, where("email", "==", email));
+        const snap = await getDocs(q);
+        let userDoc = null;
+        snap.forEach(doc => userDoc = doc);
+        if (!userDoc) {
+          // Register new user as pending approval
+          await addDoc(usersCol, {
+            name, email, role, approved: false, createdAt: new Date().toISOString()
+          });
+          alert("Sign-up successful! Await admin approval. You will receive an email when approved.");
+          hideAuthModal();
+          renderAuthBar();
+          return;
+        }
+        const userData = userDoc.data();
+        if (!userData.approved) {
+          alert("Your account is pending approval. Please wait for admin confirmation.");
+          hideAuthModal();
+          renderAuthBar();
+          return;
+        }
+        // Approved: log in
+        setUser({ name: userData.name, email: userData.email, role: userData.role, id: userDoc.id });
+        hideAuthModal();
+        renderAuthBar();
+        setTimeout(() => {
+          if (!document.getElementById("welcomeMsg")) {
+            const msg = document.createElement("div");
+            msg.id = "welcomeMsg";
+            msg.className = "fixed top-4 right-4 bg-blue-800 text-white px-4 py-2 rounded shadow-lg z-50 fade-in";
+            msg.textContent = `Welcome, ${userData.name}!`;
+            document.body.appendChild(msg);
+            setTimeout(()=>msg.remove(), 3500);
+          }
+        }, 500);
+      });
+    };
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, addDoc,
@@ -260,20 +548,7 @@
     };
 
     // DOM refs
-    const dateInput   = document.getElementById("bookingDate");
-    const rangeStart  = document.getElementById("rangeStart");
-    const rangeEnd    = document.getElementById("rangeEnd");
-    const loadingEl   = document.getElementById("loading");
-    const slotsEl     = document.getElementById("slotsContainer");
-    const modalEl     = document.getElementById("bookingModal");
-    const closeBtn    = document.getElementById("closeModalBtn");
-    const cancelBtn   = document.getElementById("cancelBtn");
-    const confirmBtn  = document.getElementById("confirmBtn");
-    const slotInfoEl  = document.getElementById("slotInfo");
-    const nameInput   = document.getElementById("studentName");
-    const classInput  = document.getElementById("studentClass");
-    const emailInput  = document.getElementById("studentEmail");
-    const bookedPreview = document.getElementById("bookedPreview");
+    // ...existing code...
 
     let selDate = "", selTime = "";
     let bookedTimes = new Set();
@@ -435,10 +710,28 @@
 
     // Show the booking modal (now passes date)
     function openModal(date, time){
-      selDate = date;
-      selTime = time;
-      slotInfoEl.textContent = `${formatDateDDMMYY(selDate)} @ ${selTime}`;
-      modalEl.classList.replace("hidden","flex");
+      const user = getUser();
+      if (!user || !user.name || !user.email || !user.role) {
+        showAuthModal();
+        return;
+      }
+      // Check approval status before allowing booking
+      import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs}) => {
+        const db = getFirestore();
+        const usersCol = collection(db, "users");
+        const q = query(usersCol, where("email", "==", user.email));
+        const snap = await getDocs(q);
+        let userDoc = null;
+        snap.forEach(doc => userDoc = doc);
+        if (!userDoc || !userDoc.data().approved) {
+          alert("Your account is not approved yet. Please wait for admin confirmation.");
+          return;
+        }
+        selDate = date;
+        selTime = time;
+        slotInfoEl.textContent = `${formatDateDDMMYY(selDate)} @ ${selTime}`;
+        modalEl.classList.replace("hidden","flex");
+      });
     }
 
     // Hide modal + reset inputs
@@ -482,9 +775,11 @@ END:VCALENDAR`;
 
     // Confirm & write to Firestore
     confirmBtn.addEventListener("click", async ()=>{
-      const name  = nameInput.value.trim();
+      // Use logged-in user info for booking
+      const user = getUser();
+      const name  = user?.name || nameInput.value.trim();
       const cls   = classInput.value.trim();
-      const email = emailInput.value.trim().toLowerCase();
+      const email = user?.email || emailInput.value.trim().toLowerCase();
 
       if(!name||!cls||!email) {
         return alert("All fields are required.");
@@ -505,16 +800,32 @@ END:VCALENDAR`;
           studentName: name,
           studentClass: cls,
           studentEmail: email,
+          status: "confirmed",
           createdAt: new Date().toISOString()
         });
         bookedTimes.add(`${selDate}|${selTime}`);
         bookedDetails.push({
           date: selDate, time: selTime,
-          studentName: name, studentClass: cls
+          studentName: name, studentClass: cls, status: "confirmed"
         });
         renderSlots(dateInput.value ? [selDate] : getDatesInRange(rangeStart.value, rangeEnd.value));
         renderBookedPreview();
         closeModal();
+
+        // Call email service after booking is confirmed
+        try {
+          // Use dynamic import for emailService.js
+          const { sendBookingConfirmation } = await import('./backend/services/emailService.js');
+          sendBookingConfirmation({
+            name,
+            email,
+            date: selDate,
+            time: selTime,
+            cls
+          });
+        } catch (err) {
+          console.warn("Email service failed:", err);
+        }
 
         // Show invoice/confirmation with Add to Calendar
         showInvoiceOverlay({
@@ -686,26 +997,42 @@ END:VCALENDAR`;
     function showWaitingListConfirmation({date, time, waitName, waitClass, waitEmail}) {
       const overlay = document.createElement("div");
       overlay.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
-      overlay.innerHTML = `
-        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full fade-in text-center">
-          <h2 class="text-2xl font-bold text-blue-600 mb-2">Added to Waiting List!</h2>
-          <div class="mb-3 text-left">
-            <div class="font-semibold text-blue-800">Date:</div>
-            <div>${formatDateDDMMYY(date)}</div>
-            <div class="font-semibold text-blue-800 mt-2">Time:</div>
-            <div>${time}</div>
-            <div class="font-semibold text-blue-800 mt-2">Name:</div>
-            <div>${waitName} (${waitClass})</div>
-            <div class="font-semibold text-blue-800 mt-2">Email:</div>
-            <div>${waitEmail}</div>
-          </div>
-          <p class="italic text-yellow-600 mt-4">
-            We'll notify you if this slot becomes available!
-          </p>
-          <button class="mt-6 px-4 py-2 border rounded text-gray-700 hover:bg-gray-100" id="closeWaitBtn">Close</button>
-        </div>`;
-      document.body.appendChild(overlay);
-      overlay.querySelector("#closeWaitBtn").onclick = () => overlay.remove();
+      // Fetch queue position
+      import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs}) => {
+        const db = getFirestore();
+        const waitingCol = collection(db, "waiting_list");
+        const q = query(waitingCol, where("date", "==", date), where("time", "==", time));
+        const snap = await getDocs(q);
+        let queueNum = 1;
+        let found = false;
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d.studentEmail === waitEmail) found = true;
+          if (!found) queueNum++;
+        });
+        overlay.innerHTML = `
+          <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full fade-in text-center">
+            <h2 class="text-2xl font-bold text-blue-600 mb-2">Added to Waiting List!</h2>
+            <div class="mb-3 text-left">
+              <div class="font-semibold text-blue-800">Date:</div>
+              <div>${formatDateDDMMYY(date)}</div>
+              <div class="font-semibold text-blue-800 mt-2">Time:</div>
+              <div>${time}</div>
+              <div class="font-semibold text-blue-800 mt-2">Name:</div>
+              <div>${waitName} (${waitClass})</div>
+              <div class="font-semibold text-blue-800 mt-2">Email:</div>
+              <div>${waitEmail}</div>
+              <div class="font-semibold text-green-700 mt-2">Your Queue Number:</div>
+              <div class="text-green-700 text-xl font-bold">${queueNum}</div>
+            </div>
+            <p class="italic text-yellow-600 mt-4">
+              We'll notify you if this slot becomes available!
+            </p>
+            <button class="mt-6 px-4 py-2 border rounded text-gray-700 hover:bg-gray-100" id="closeWaitBtn">Close</button>
+          </div>`;
+        document.body.appendChild(overlay);
+        overlay.querySelector("#closeWaitBtn").onclick = () => overlay.remove();
+      });
     }
 
     // Kick things off
@@ -713,7 +1040,8 @@ END:VCALENDAR`;
   </script>
   <!-- Footnote -->
   <footer class="text-center text-xs text-gray-500 mt-10 mb-2">
-    Created by Mr. Albert
+    Created by Mr. Albert<br>
+    <span class="text-xs text-blue-700">Admin: To approve teachers, go to your Firebase Firestore, create a 'teachers' collection, add a document for each teacher with fields: 'email' (string, must match their login email), 'approved' (boolean, set to true to approve). Teachers will see 'Pending Approval' until you set 'approved' to true.</span>
   </footer>
 </body>
 </html>

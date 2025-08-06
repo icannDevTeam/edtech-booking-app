@@ -83,9 +83,9 @@
 <body class="bg-gradient-to-br from-primary-50 to-primary-200 min-h-screen">
   <!-- Home/Back Button Top Right -->
   <div class="absolute top-6 right-6 z-20">
-    <a href="index.html" title="Back to Booking Page" class="inline-flex items-center px-4 py-2 bg-white text-primary-700 rounded-full shadow-lg border border-primary-200 hover:bg-primary-100 transition-colors duration-200">
+    <button id="homeBtn" title="Back to Booking Page" class="inline-flex items-center px-4 py-2 bg-white text-primary-700 rounded-full shadow-lg border border-primary-200 hover:bg-primary-100 transition-colors duration-200">
       <i class="fas fa-home text-xl"></i>
-    </a>
+    </button>
   </div>
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <!-- Header with logo and title -->
@@ -97,58 +97,7 @@
       <p class="text-yellow-100">Teacher Portal - Manage your bookings</p>
     </header>
 
-    <!-- Auth Section -->
-    <div id="authSection" class="mb-10 flex flex-col items-center">
-      <div class="w-full max-w-md bg-white rounded-xl card p-8 flex flex-col gap-6">
-        <div class="text-center">
-          <h2 class="text-xl font-semibold text-secondary-800">Welcome back</h2>
-          <p class="text-secondary-500 text-sm mt-1">Sign in to manage your bookings</p>
-        </div>
-        
-        <div class="space-y-4">
-          <!-- Sign in with Email button removed -->
-          
-          <div class="text-center text-secondary-600 text-sm">
-            Don't have portal access yet?
-          </div>
-          
-          <div class="flex flex-col sm:flex-row gap-2 justify-center">
-            <button id="googleSignInBtn" class="px-4 py-2 btn-accent text-white rounded-lg font-medium hover:shadow-md transition-all flex items-center justify-center gap-2 w-full">
-              <i class="fab fa-google"></i> Sign in with Google
-            </button>
-          </div>
-          <div id="requestStatus" class="text-sm text-center mt-1"></div>
-          <div class="text-center mt-4">
-            <a href="#" id="signUpLink" class="text-blue-700 hover:underline text-sm">Don't have an account? Sign Up</a>
-          </div>
-  <!-- Sign Up Modal -->
-  <div id="signUpModal" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full fade-in">
-      <h2 class="text-xl font-bold text-blue-800 mb-2">Teacher Sign Up</h2>
-      <form id="signUpForm" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-          <input type="text" id="signUpName" required class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <input type="email" id="signUpEmail" required class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Subject/Role</label>
-          <input type="text" id="signUpSubject" required class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500" />
-        </div>
-        <div class="flex flex-col sm:flex-row sm:justify-end gap-3 mt-4">
-          <button type="button" id="cancelSignUpBtn" class="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition">Cancel</button>
-          <button type="submit" class="flex-1 sm:flex-none px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Submit</button>
-        </div>
-      </form>
-      <div id="signUpStatus" class="text-sm text-center mt-2"></div>
-    </div>
-  </div>
-        </div>
-      </div>
-    </div>
+  <!-- ...existing code... -->
 
     <!-- Portal Section (hidden initially) -->
     <div id="portalSection" class="hidden">
@@ -156,6 +105,7 @@
         <div>
           <h2 class="text-xl font-semibold text-secondary-800">My Bookings Dashboard</h2>
           <p class="text-secondary-500 text-sm">Manage your Discovery Room bookings</p>
+          <p id="welcomeName" class="text-primary-700 text-lg font-bold mt-2"></p>
         </div>
         <button id="logoutBtn" class="px-4 py-2 btn-secondary text-white rounded-lg font-medium flex items-center gap-2 hover:shadow-md">
           <i class="fas fa-sign-out-alt"></i>
@@ -184,20 +134,7 @@
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-secondary-200">
-                <!-- Example booking row -->
-                <tr>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">May 15, 2023</td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">09:00 - 11:00</td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">Discovery A</td>
-                  <td class="px-4 py-3 text-sm text-secondary-800">Physics Workshop</td>
-                  <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Confirmed</span>
-                  </td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">
-                    <button class="text-primary-600 hover:text-primary-800 mr-2"><i class="fas fa-edit"></i></button>
-                    <button class="text-accent-600 hover:text-accent-800"><i class="fas fa-trash"></i></button>
-                  </td>
-                </tr>
+                <!-- Bookings will be loaded here -->
               </tbody>
             </table>
           </div>
@@ -216,15 +153,7 @@
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-secondary-200">
-                <!-- Example queue row -->
-                <tr>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">May 10, 2023</td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">May 20, 2023</td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">Discovery B</td>
-                  <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                  </td>
-                </tr>
+                <!-- Queue will be loaded here -->
               </tbody>
             </table>
           </div>
@@ -234,10 +163,10 @@
   </div>
 
   <!-- Modals would go here in a real implementation -->
-  
-  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore-compat.js"></script>
   <script>
     // Firebase config (same as index.html)
     const firebaseConfig = {
@@ -253,74 +182,196 @@
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Google Sign-In
-      document.getElementById('googleSignInBtn').addEventListener('click', async function() {
-        const statusDiv = document.getElementById('requestStatus');
-        statusDiv.textContent = 'Signing in with Google...';
-        statusDiv.className = 'text-sm text-center mt-1 text-blue-600';
-        const provider = new firebase.auth.GoogleAuthProvider();
-        try {
-          const result = await firebase.auth().signInWithPopup(provider);
-          const user = result.user;
-          if (user && user.email) {
-            // Check Firestore for teacher approval
-            const teachersRef = firebase.firestore().collection('teachers');
-            const snapshot = await teachersRef.where('email', '==', user.email.toLowerCase()).get();
-            if (!snapshot.empty) {
-              const teacherDoc = snapshot.docs[0].data();
-              if (teacherDoc.status === 'approved') {
-                statusDiv.textContent = 'Sign-in successful!';
-                statusDiv.className = 'text-sm text-center mt-1 text-green-600';
-                document.getElementById('authSection').classList.add('hidden');
-                document.getElementById('portalSection').classList.remove('hidden');
-              } else {
-                statusDiv.textContent = 'Your account is pending approval. Please wait for admin approval.';
-                statusDiv.className = 'text-sm text-center mt-1 text-yellow-600';
-              }
-            } else {
-              statusDiv.textContent = 'No teacher account found for this email. Please sign up first.';
-              statusDiv.className = 'text-sm text-center mt-1 text-red-600';
-            }
-          }
-        } catch (err) {
-          statusDiv.textContent = 'Google sign-in failed.';
-          statusDiv.className = 'text-sm text-center mt-1 text-accent-600';
-        }
-      });
-
-      // Sign Up Modal Logic
-      document.getElementById('signUpLink').onclick = function(e) {
-        e.preventDefault();
-        document.getElementById('signUpModal').classList.remove('hidden');
-        document.getElementById('signUpModal').classList.add('flex');
-      };
-      document.getElementById('cancelSignUpBtn').onclick = function() {
-        document.getElementById('signUpModal').classList.remove('flex');
-        document.getElementById('signUpModal').classList.add('hidden');
-      };
-      document.getElementById('signUpForm').onsubmit = async function(e) {
-        e.preventDefault();
-        const name = document.getElementById('signUpName').value.trim();
-        const email = document.getElementById('signUpEmail').value.trim().toLowerCase();
-        const subject = document.getElementById('signUpSubject').value.trim();
-        const statusDiv = document.getElementById('signUpStatus');
-        if(!name || !email || !subject) {
-          statusDiv.textContent = 'All fields are required.';
-          statusDiv.className = 'text-red-600';
+      // Check authentication and approval from localStorage (set by index.html)
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('edtechUser'));
+      } catch { user = null; }
+      if (!user || !user.name || !user.email || !user.role) {
+        // Not authenticated, redirect to main page
+        window.location.href = 'index.html';
+        return;
+      }
+      // Check approval status from Firestore
+      firebase.firestore().collection('users').where('email', '==', user.email).get().then(snap => {
+        let userDoc = null;
+        snap.forEach(doc => userDoc = doc);
+        if (!userDoc || !userDoc.data().approved) {
+          // Not approved, redirect to main page
+          window.location.href = 'index.html';
           return;
         }
-        try {
-          await firebase.firestore().collection('teachers').add({
-            name, email, subject, createdAt: new Date().toISOString(), status: 'pending'
-          });
-          statusDiv.textContent = 'Sign-up request submitted! You will be notified once approved.';
-          statusDiv.className = 'text-green-600';
-          document.getElementById('signUpForm').reset();
-        } catch (err) {
-          statusDiv.textContent = 'Failed to submit sign-up. Please try again.';
-          statusDiv.className = 'text-red-600';
+        // Authenticated and approved: show portal
+        document.getElementById('portalSection').classList.remove('hidden');
+        // Show welcome name
+        const welcomeName = document.getElementById('welcomeName');
+        if (welcomeName) welcomeName.textContent = `Welcome, ${user.name}!`;
+        // Home/Back button logic
+        const homeBtn = document.getElementById('homeBtn');
+        if (homeBtn) {
+          homeBtn.onclick = function() {
+            window.location.href = 'index.html';
+          };
         }
-      };
+        // New Booking button logic
+        const newBookingBtn = document.getElementById('newBookingBtn');
+        if (newBookingBtn) {
+          newBookingBtn.onclick = function() {
+            window.location.href = 'index.html';
+          };
+        }
+        // Logout button logic
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+          logoutBtn.onclick = function() {
+            window.loggedInTeacherName = '';
+            localStorage.removeItem('edtechUser');
+            window.location.href = 'index.html';
+          };
+        }
+        // Load teacher bookings and queue from Firestore
+        async function loadTeacherBookings(email) {
+          // Bookings
+          const bookingsTable = document.querySelector('#bookingsTable tbody');
+          bookingsTable.innerHTML = '';
+          const bookingsSnap = await firebase.firestore().collection('bookings').where('studentEmail', '==', email).get();
+          bookingsSnap.forEach(doc => {
+            const data = doc.data();
+            const tr = document.createElement('tr');
+            let statusLabel = '';
+            let statusClass = '';
+            let disableActions = false;
+            if (data.status === 'confirmed') {
+              statusLabel = 'Confirmed';
+              statusClass = 'bg-green-100 text-green-800';
+            } else if (data.status === 'rescheduled') {
+              statusLabel = 'Rescheduled';
+              statusClass = 'bg-gray-300 text-gray-600';
+              disableActions = true;
+            } else {
+              statusLabel = data.status || 'Pending';
+              statusClass = 'bg-yellow-100 text-yellow-800';
+            }
+            tr.innerHTML = `
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">${data.date || ''}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">${data.time || ''}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">${data.room || ''}</td>
+              <td class="px-4 py-3 text-sm text-secondary-800">${data.purpose || ''}</td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs font-medium rounded-full ${statusClass}">${statusLabel}</span>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">
+                <button class="text-primary-600 hover:text-primary-800 mr-2 edit-booking-btn" data-id="${doc.id}" ${disableActions ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}><i class="fas fa-edit"></i></button>
+                <button class="text-accent-600 hover:text-accent-800 cancel-booking-btn" data-id="${doc.id}" ${disableActions ? 'disabled style="opacity:0.5;cursor:not-allowed"' : ''}><i class="fas fa-trash"></i></button>
+              </td>
+            `;
+            bookingsTable.appendChild(tr);
+          });
+          // Queue (pending bookings)
+          const queueTable = document.querySelector('#queueTable tbody');
+          queueTable.innerHTML = '';
+          const queueSnap = await firebase.firestore().collection('bookings').where('studentEmail', '==', email).where('status', '==', 'pending').get();
+          queueSnap.forEach(doc => {
+            const data = doc.data();
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">${data.createdAt ? new Date(data.createdAt).toLocaleDateString() : ''}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">${data.date || ''}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-secondary-800">${data.room || ''}</td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+              </td>
+            `;
+            queueTable.appendChild(tr);
+          });
+          // Add edit/cancel listeners
+          document.querySelectorAll('.edit-booking-btn').forEach(btn => {
+            btn.onclick = function() {
+              const bookingId = btn.getAttribute('data-id');
+              // Find booking data
+              const bookingRow = btn.closest('tr');
+              const statusCell = bookingRow.querySelector('td:nth-child(5) span');
+              const isConfirmed = statusCell && statusCell.textContent.trim().toLowerCase() === 'confirmed';
+              const isRescheduled = statusCell && statusCell.textContent.trim().toLowerCase() === 'rescheduled';
+              if (isConfirmed) {
+                showConfirmEditModal(bookingId);
+              } else if (!isRescheduled) {
+                showEditBookingModal(bookingId, email);
+              }
+            };
+          });
+          document.querySelectorAll('.cancel-booking-btn').forEach(btn => {
+            btn.onclick = async function() {
+              const bookingId = btn.getAttribute('data-id');
+              const bookingRow = btn.closest('tr');
+              const statusCell = bookingRow.querySelector('td:nth-child(5) span');
+              const isRescheduled = statusCell && statusCell.textContent.trim().toLowerCase() === 'rescheduled';
+              if (!isRescheduled) {
+                if (confirm('Are you sure you want to cancel this booking?')) {
+                  await firebase.firestore().collection('bookings').doc(bookingId).delete();
+                  loadTeacherBookings(email);
+                }
+              }
+            };
+          });
+        }
+        // Modal for confirmed booking: Reschedule or Cancel
+        function showConfirmEditModal(bookingId) {
+          // Remove any existing modal
+          let old = document.getElementById('editBookingModal');
+          if (old) old.remove();
+          const modal = document.createElement('div');
+          modal.id = 'editBookingModal';
+          modal.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50';
+          modal.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full fade-in text-center">
+              <h2 class="text-xl font-bold text-blue-800 mb-4">Edit Booking</h2>
+              <p class="mb-4 text-gray-700">What would you like to do with this confirmed booking?</p>
+              <div class="flex flex-col gap-3">
+                <button id="rescheduleBtn" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">Reschedule</button>
+                <button id="cancelBookingBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Cancel Booking</button>
+                <button id="closeEditModalBtn" class="mt-2 px-4 py-2 border rounded text-gray-700 hover:bg-gray-100">Close</button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          modal.querySelector('#closeEditModalBtn').onclick = () => modal.remove();
+          modal.querySelector('#rescheduleBtn').onclick = async () => {
+            // Delete original booking to free the slot
+            try {
+              await firebase.firestore().collection('bookings').doc(bookingId).delete();
+            } catch (err) {
+              alert('Failed to reschedule booking.');
+              return;
+            }
+            modal.remove();
+            window.location.href = 'index.html';
+          };
+          modal.querySelector('#cancelBookingBtn').onclick = async () => {
+            try {
+              await firebase.firestore().collection('bookings').doc(bookingId).delete();
+              modal.remove();
+              alert('Booking cancelled. The slot is now available for others.');
+              loadTeacherBookings(user.email);
+            } catch (err) {
+              alert('Failed to cancel booking.');
+            }
+          };
+        }
+        // Show edit modal for booking (simple prompt for new date)
+        function showEditBookingModal(bookingId, email) {
+          const newDate = prompt('Enter new booking date (YYYY-MM-DD):');
+          if (newDate) {
+            firebase.firestore().collection('bookings').doc(bookingId).update({ date: newDate, status: 'pending' })
+              .then(() => {
+                alert('Booking date updated and moved to queue for approval.');
+                loadTeacherBookings(email);
+              });
+          }
+        }
+        // Load bookings for this teacher
+        loadTeacherBookings(user.email);
+      });
     });
   </script>
 </body>
