@@ -228,7 +228,7 @@
         statusDiv.textContent = 'Sending request...';
         statusDiv.className = 'text-sm text-center mt-1 text-blue-600';
         try {
-          const response = await fetch('https://requestaccess-ibmowm5csq-uc.a.run.app', {
+          const response = await fetch('https://us-central1-school-booking-platform.cloudfunctions.net/requestAccess', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email })
