@@ -390,7 +390,21 @@
         </div>
       `;
       document.body.appendChild(modal);
-      modal.querySelector("#closeEmailPasswordLoginBtn").onclick = () => modal.remove();
+      setTimeout(() => {
+        function outsideClick(e) {
+          const content = modal.querySelector(".fade-in");
+          if (content && !content.contains(e.target)) {
+            modal.remove();
+            document.removeEventListener("mousedown", outsideClick);
+          }
+        }
+        document.addEventListener("mousedown", outsideClick);
+        modal._outsideClick = outsideClick;
+      }, 100);
+      modal.querySelector("#closeEmailPasswordLoginBtn").onclick = () => {
+        modal.remove();
+        if (modal._outsideClick) document.removeEventListener("mousedown", modal._outsideClick);
+      };
       modal.querySelector("#emailPasswordLoginForm").onsubmit = async (e) => {
         e.preventDefault();
         const email = modal.querySelector("#loginEmail").value.trim().toLowerCase();
@@ -465,7 +479,6 @@
     function showAuthModal() {
       authModal.style.display = "flex";
       setTimeout(() => {
-        // Add click outside to close
         function outsideClick(e) {
           const modalContent = document.getElementById("authModalContent");
           if (authModal.style.display === "flex" && modalContent && !modalContent.contains(e.target)) {
@@ -474,10 +487,15 @@
           }
         }
         document.addEventListener("mousedown", outsideClick);
+        authModal._outsideClick = outsideClick;
       }, 100);
     }
     function hideAuthModal() {
       authModal.style.display = "none";
+      if (authModal._outsideClick) {
+        document.removeEventListener("mousedown", authModal._outsideClick);
+        delete authModal._outsideClick;
+      }
     }
     function getUser() {
       try {
@@ -1146,7 +1164,10 @@ END:VCALENDAR`;
         <a href="teacher-portal.html" class="hover:text-yellow-400 font-semibold">Teacher Portal</a>
         <a href="mailto:albert.arthur@binus.edu" class="hover:text-yellow-400 font-semibold">Contact Mr. Albert</a>
       </div>
-      <div class="text-xs text-yellow-300 mt-2 md:mt-0">&copy; 2025 BINUS School Simprug EdTech Booking</div>
+      <div class="flex flex-col items-end md:items-end gap-1">
+        <div class="text-xs text-yellow-300">&copy; 2025 BINUS School Simprug EdTech Booking</div>
+        <div class="text-xs text-yellow-400 italic">Designed by Albert Arthur</div>
+      </div>
     </div>
   </footer>
 </body>

@@ -106,8 +106,8 @@ const requestStatus = document.getElementById('requestStatus');
 if (requestAccessBtn) {
   requestAccessBtn.onclick = async () => {
     const email = requestEmailInput.value.trim();
-    if (!email || !email.endsWith('@binus.edu')) {
-      requestStatus.textContent = 'Please enter a valid BINUSIAN email.';
+    if (!email) {
+      requestStatus.textContent = 'Please enter a valid email address.';
       requestStatus.className = 'text-sm text-center mt-1 text-accent-600';
       return;
     }
