@@ -8,20 +8,43 @@
  */
 
 const { onRequest } = require("firebase-functions/v2/https");
-
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 
 require('dotenv').config();
 const functions   = require('firebase-functions');
 const admin = require('firebase-admin');
-const SibApiV3Sdk = require('sib-api-v3-sdk');
 
+const nodemailer = require('nodemailer');
 admin.initializeApp();
 const db = admin.firestore();
 
-// Set up Brevo (Sendinblue)
-const client = SibApiV3Sdk.ApiClient.instance;
-client.authentications['api-key'].apiKey = process.env.BREVO_KEY;
-const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+// Gmail credentials from environment variables (use App Password)
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_PASS = process.env.GMAIL_PASS;
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: GMAIL_USER,
+    pass: GMAIL_PASS
+  }
+});
+// Firestore trigger: send sign-up code email when a new user is created (v2 API)
+exports.sendSignupCode = onDocumentCreated("users/{userId}", async (event) => {
+  const user = event.data?.data();
+  if (!user || !user.email || !user.password) return;
+  const mailOptions = {
+    from: `Discovery Room Booking <${GMAIL_USER}>`,
+    to: user.email,
+    subject: 'Your Discovery Room Booking Sign-Up Code',
+    text: `Hello ${user.name || ''},\n\nYour sign-up code is: ${user.password}\n\nUse this code to log in.\n\nThank you!\nDiscovery Room Booking Team`
+  };
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Signup code email sent to', user.email);
+  } catch (error) {
+    console.error('Error sending signup code email:', error);
+  }
+});
 
 // Minimal test endpoint to send an email
 exports.sendTestEmail = onRequest(async (req, res) => {
@@ -43,21 +66,20 @@ exports.sendTestEmail = onRequest(async (req, res) => {
 
 
 // Firestore trigger: send email when a new booking is created (v2 API)
-const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 exports.sendBookingEmail = onDocumentCreated("bookings/{bookingId}", async (event) => {
   const data = event.data?.data();
   if (!data || !data.studentEmail) {
-    logger.error('Missing booking data or studentEmail');
+    console.error('Missing booking data or studentEmail');
     return;
   }
   try {
     const calendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=Booking+with+${encodeURIComponent(data.studentName || 'Student')}&dates=${data.date.replace(/-/g, '')}T${data.time.replace(/:/g, '')}00Z/${data.date.replace(/-/g, '')}T${data.time.replace(/:/g, '')}00Z&details=Your+booking+is+confirmed+at+${data.time}+on+${data.date}&location=Online`;
 
-    const sendSmtpEmail = {
-      to: [{ email: data.studentEmail, name: data.studentName || 'Student' }],
-      sender: { email: 'arthurapp05@gmail.com', name: 'Your Name' },
+    const mailOptions = {
+      from: `Discovery Room Booking <${GMAIL_USER}>`,
+      to: data.studentEmail,
       subject: 'Your Booking is Confirmed!',
-      htmlContent: `
+      html: `
         <h1>Booking Confirmed</h1>
         <p>Hi ${data.studentName || ''},</p>
         <p>Your booking for ${data.date} at ${data.time} is confirmed!</p>
@@ -71,10 +93,10 @@ exports.sendBookingEmail = onDocumentCreated("bookings/{bookingId}", async (even
         <p><a href="${calendarLink}" target="_blank">Add to Calendar</a></p>
       `
     };
-    await emailApi.sendTransacEmail(sendSmtpEmail);
-    logger.info('Booking confirmation email sent to', data.studentEmail);
+    await transporter.sendMail(mailOptions);
+    console.log('Booking confirmation email sent to', data.studentEmail);
   } catch (err) {
-    logger.error('Failed to send booking email', err);
+    console.error('Failed to send booking email', err);
   }
 });
 

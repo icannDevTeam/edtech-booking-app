@@ -2,5 +2,13 @@
   "dependencies": {
     "form-data": "^4.0.4",
     "mailgun.js": "^12.0.3"
+  },
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./asset/tailwind.css -o ./asset/tailwind-built.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0"
   }
 }

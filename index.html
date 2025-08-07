@@ -2,15 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Teacher Booking – Albert Arthur</title>
   <!-- Tailwind & FontAwesome -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Use built Tailwind CSS for production -->
+  <link rel="stylesheet" href="/asset/tailwind-built.css">
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
   <style>
+    /* Gallery hover effects */
+    .edtech-gallery-img {
+      transition: transform 0.35s cubic-bezier(.4,2,.6,1), box-shadow 0.25s;
+      cursor: pointer;
+    }
+    .edtech-gallery-img:hover {
+      transform: scale(1.06) rotate(-2deg);
+      box-shadow: 0 8px 32px 0 rgba(30,58,138,0.18), 0 1.5px 8px 0 #FFD700;
+      z-index: 2;
+    }
+    /* Discovery Room card hover */
+    .discovery-card {
+      transition: transform 0.33s cubic-bezier(.4,2,.6,1), box-shadow 0.22s, border-color 0.22s;
+      cursor: pointer;
+    }
+    .discovery-card:hover {
+      transform: translateY(-8px) scale(1.04) rotate(1deg);
+      box-shadow: 0 8px 32px 0 #FFD70044, 0 1.5px 8px 0 #80000033;
+      border-color: #FFD700;
+    }
+    /* Marquee item hover */
+    #discoveryMarquee span[style*="color: #fff"] {
+      transition: color 0.22s, text-shadow 0.22s;
+      cursor: pointer;
+    }
+    #discoveryMarquee span[style*="color: #fff"]:hover {
+      color: #FFD700 !important;
+      text-shadow: 0 0 8px #FFD700, 0 0 2px #fff;
+    }
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -58,7 +92,7 @@
 </head>
 <body class="bg-blue-900 min-h-screen">
   <!-- Header Section: Teacher Portal (top left), Logo & Auth (top right), Centered Heading -->
-  <div class="container mx-auto px-6 max-w-6xl relative">
+  <div class="container mx-auto px-2 sm:px-4 md:px-6 max-w-full md:max-w-6xl relative">
     <header class="relative flex flex-col items-center justify-center mb-6" style="min-height:120px;">
       <!-- Teacher Portal Top Left -->
       <div id="teacherPortalBtn" class="absolute top-8 left-0 z-20">
@@ -104,7 +138,7 @@
       </form>
     </div>
   </div>
-  <div class="container mx-auto px-6 py-8 max-w-6xl relative" id="mainContent">
+  <div class="container mx-auto px-2 sm:px-4 md:px-6 py-8 max-w-full md:max-w-6xl relative" id="mainContent">
     <!-- ...existing code... -->
 
     <!-- Banner -->
@@ -177,12 +211,12 @@
         Life in Our EdTech Class
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <img src="./images/Grade1.jpg" alt="Grade 1" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
-        <img src="./images/My_gys.jpg" alt="Fun Activity" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
-        <img src="./images/Space.jpg" alt="Space Learning" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
-        <img src="./images/Girlsclub.jpg" alt="Girls Club" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
-        <img src="./images/Madeit.jpg" alt="Project Success" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
-        <img src="./images/Coding.jpg" alt="Coding Time" class="h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Grade1.jpg" alt="Grade 1" class="edtech-gallery-img h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/My_gys.jpg" alt="Fun Activity" class="edtech-gallery-img h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Space.jpg" alt="Space Learning" class="edtech-gallery-img h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Girlsclub.jpg" alt="Girls Club" class="edtech-gallery-img h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Madeit.jpg" alt="Project Success" class="edtech-gallery-img h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
+        <img src="./images/Coding.jpg" alt="Coding Time" class="edtech-gallery-img h-64 w-full object-cover rounded-xl shadow-xl border-2 border-yellow-200" />
       </div>
     </section>
   </div>
@@ -246,8 +280,7 @@
   </div>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js"></script>
+  <!-- Remove non-module Firebase scripts; use ES module imports below -->
 
   <!-- Booking Logic -->
   <script type="module">
@@ -313,7 +346,7 @@
         loginLink.textContent = "Login";
         loginLink.onclick = (e) => {
           e.preventDefault();
-          showRoleLoginModal("teacher");
+          showEmailPasswordLoginModal();
         };
         linkBar.appendChild(loginLink);
 
@@ -331,40 +364,38 @@
         authBar.appendChild(linkBar);
         // Ensure Teacher Portal never opens auth modal
         teacherPortalLink.onclick = (e) => { e.preventDefault(); };
-    // --- Role Login Modal Logic ---
-    function showRoleLoginModal(role) {
-      // Remove any existing modal
-      let old = document.getElementById("roleLoginModal");
+
+    // --- Email/Password Login Modal Logic ---
+    function showEmailPasswordLoginModal() {
+      let old = document.getElementById("emailPasswordLoginModal");
       if (old) old.remove();
       const modal = document.createElement("div");
-      modal.id = "roleLoginModal";
+      modal.id = "emailPasswordLoginModal";
       modal.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50";
-      let color = role === "teacher" ? "bg-maroon text-white" : "bg-blue-800 text-white";
-      let title = role === "teacher" ? "Teacher Login" : "Staff Login";
       modal.innerHTML = `
-        <div class="${color} p-8 rounded-xl shadow-2xl max-w-md w-full fade-in">
-          <h2 class="text-2xl font-bold mb-4">${title}</h2>
-          <form id="roleLoginForm" class="space-y-6">
-            <div>
-              <label class="block text-sm font-medium mb-2">Name</label>
-              <input type="text" id="roleLoginName" required class="w-full px-4 py-3 border rounded-lg text-black" />
-            </div>
+        <div class="bg-blue-800 text-white p-8 rounded-xl shadow-2xl max-w-md w-full fade-in">
+          <h2 class="text-2xl font-bold mb-4">Login</h2>
+          <form id="emailPasswordLoginForm" class="space-y-6">
             <div>
               <label class="block text-sm font-medium mb-2">Email</label>
-              <input type="email" id="roleLoginEmail" required class="w-full px-4 py-3 border rounded-lg text-black" />
+              <input type="email" id="loginEmail" required class="w-full px-4 py-3 border rounded-lg text-black" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Password (Code from Email)</label>
+              <input type="text" id="loginPassword" required class="w-full px-4 py-3 border rounded-lg text-black" />
             </div>
             <button type="submit" class="w-full px-6 py-3 bg-yellow-500 text-maroon rounded-lg font-semibold shadow hover:bg-yellow-600 transition">Login</button>
           </form>
-          <button id="closeRoleLoginBtn" class="mt-6 px-4 py-2 border rounded text-white hover:bg-gray-100 hover:text-black">Close</button>
+          <button id="closeEmailPasswordLoginBtn" class="mt-6 px-4 py-2 border rounded text-white hover:bg-gray-100 hover:text-black">Close</button>
         </div>
       `;
       document.body.appendChild(modal);
-      modal.querySelector("#closeRoleLoginBtn").onclick = () => modal.remove();
-      modal.querySelector("#roleLoginForm").onsubmit = async (e) => {
+      modal.querySelector("#closeEmailPasswordLoginBtn").onclick = () => modal.remove();
+      modal.querySelector("#emailPasswordLoginForm").onsubmit = async (e) => {
         e.preventDefault();
-        const name = modal.querySelector("#roleLoginName").value.trim();
-        const email = modal.querySelector("#roleLoginEmail").value.trim().toLowerCase();
-        if (!name || !email) {
+        const email = modal.querySelector("#loginEmail").value.trim().toLowerCase();
+        const password = modal.querySelector("#loginPassword").value.trim();
+        if (!email || !password) {
           alert("All fields are required.");
           return;
         }
@@ -372,11 +403,10 @@
           alert("Use your school email (@binus.edu or @binus.org)." );
           return;
         }
-        // Check if user exists and approved
-        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs, addDoc}) => {
+        import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs}) => {
           const db = getFirestore();
           const usersCol = collection(db, "users");
-          const q = query(usersCol, where("email", "==", email), where("role", "==", role));
+          const q = query(usersCol, where("email", "==", email));
           const snap = await getDocs(q);
           let userDoc = null;
           snap.forEach(doc => userDoc = doc);
@@ -385,11 +415,10 @@
             return;
           }
           const userData = userDoc.data();
-          if (!userData.approved) {
-            alert("Your account is pending approval. Please wait for admin confirmation.");
+          if (userData.password !== password) {
+            alert("Incorrect code/password. Please check your email.");
             return;
           }
-          // Approved: log in
           setUser({ name: userData.name, email: userData.email, role: userData.role, id: userDoc.id });
           modal.remove();
           renderAuthBar();
@@ -467,11 +496,7 @@
         alert("All fields are required.");
         return;
       }
-      if (!email.endsWith("@binus.edu") && !email.endsWith("@binus.org")) {
-        alert("Use your school email (@binus.edu or @binus.org)." );
-        return;
-      }
-      // Check if user exists and approved
+      // Check if user exists
       import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs, addDoc}) => {
         const db = getFirestore();
         const usersCol = collection(db, "users");
@@ -480,37 +505,23 @@
         let userDoc = null;
         snap.forEach(doc => userDoc = doc);
         if (!userDoc) {
-          // Register new user as pending approval
+          // Register new user, generate password code
+          const password = Math.random().toString(36).slice(-8).toUpperCase();
           await addDoc(usersCol, {
-            name, email, role, approved: false, createdAt: new Date().toISOString()
+            name, email, role, password, approved: true, createdAt: new Date().toISOString()
           });
-          alert("Sign-up successful! Await admin approval. You will receive an email when approved.");
+          // Nodemailer (via Firebase Function) will send the code email automatically
+          alert("Sign-up successful! Your code has been sent to your email. Use it to log in.");
           hideAuthModal();
           renderAuthBar();
           return;
         }
         const userData = userDoc.data();
-        if (!userData.approved) {
-          alert("Your account is pending approval. Please wait for admin confirmation.");
-          hideAuthModal();
-          renderAuthBar();
-          return;
-        }
-        // Approved: log in
-        setUser({ name: userData.name, email: userData.email, role: userData.role, id: userDoc.id });
+        alert("Account already exists. Please log in.");
         hideAuthModal();
         renderAuthBar();
-        setTimeout(() => {
-          if (!document.getElementById("welcomeMsg")) {
-            const msg = document.createElement("div");
-            msg.id = "welcomeMsg";
-            msg.className = "fixed top-4 right-4 bg-blue-800 text-white px-4 py-2 rounded shadow-lg z-50 fade-in";
-            msg.textContent = `Welcome, ${userData.name}!`;
-            document.body.appendChild(msg);
-            setTimeout(()=>msg.remove(), 3500);
-          }
-        }, 500);
       });
+    // EmailJS logic removed. All sign-up code emails are now sent by the backend (Firebase Function with Nodemailer).
     };
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import {
@@ -784,9 +795,6 @@ END:VCALENDAR`;
       if(!name||!cls||!email) {
         return alert("All fields are required.");
       }
-      if(!email.endsWith("@binus.edu") && !email.endsWith("@binus.org")){
-        return alert("Use your school email (@binus.edu or @binus.org).");
-      }
       // Double-check duplicate
       if(bookedTimes.has(`${selDate}|${selTime}`)){
         // Slot is booked, offer waiting list
@@ -973,10 +981,6 @@ END:VCALENDAR`;
           alert("All fields are required.");
           return;
         }
-        if(!waitEmail.endsWith("@binus.edu") && !waitEmail.endsWith("@binus.org")){
-          alert("Use your school email (@binus.edu or @binus.org).");
-          return;
-        }
         try {
           await addDoc(waitingCol, {
             date, time,
@@ -1039,8 +1043,8 @@ END:VCALENDAR`;
     loadBookings();
   </script>
   <!-- Binus Spirit Values Animation (no dividing line) -->
-  <div class="w-full overflow-hidden bg-blue-950 py-3 mt-10 mb-2 relative">
-    <div id="spiritValuesBar" class="absolute whitespace-nowrap text-yellow-300 text-lg font-bold flex items-center animate-spirit-scroll" style="will-change: transform; left:100%;">
+  <div class="w-full overflow-x-hidden bg-blue-950 py-3 mt-10 mb-2 relative" style="height: 2.5rem;">
+    <div id="spiritValuesBar" class="whitespace-nowrap text-yellow-300 text-lg font-bold flex items-center animate-spirit-scroll" style="position: absolute; top: 0; left: 100%; height: 2.5rem; line-height: 2.5rem; background: transparent;">
       <span class="px-8">S - Striving for Excellence</span>
       <span class="px-8">P - Perseverance</span>
       <span class="px-8">I - Integrity</span>
@@ -1058,6 +1062,81 @@ END:VCALENDAR`;
       }
     </style>
   </div>
+
+  <!-- Discovery Room Items Marquee -->
+  <div class="w-full overflow-x-hidden bg-yellow-200 py-3 mb-8 relative" style="height: 2.5rem;">
+    <div id="discoveryMarquee" class="whitespace-nowrap text-maroon text-xl font-bold flex items-center animate-discovery-scroll" style="position: absolute; top: 0; left: 100%; height: 2.5rem; line-height: 2.5rem; background: transparent; letter-spacing: 0.5px;">
+      <span class="px-8" style="color: #fff;">MetaQuest 3 Headset</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Active Floor</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Interactive Screen</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Legos</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">MBOT2 Advance</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Botley 2.0</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">MetaQuest 3 Headset</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Active Floor</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Interactive Screen</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Legos</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">MBOT2 Advance</span>
+      <span class="mx-2 text-2xl" style="color: #FFD700;">|</span>
+      <span class="px-8" style="color: #fff;">Botley 2.0</span>
+    </div>
+    <style>
+      @keyframes discovery-scroll {
+        0%   { left: 100%; }
+        100% { left: -100%; }
+      }
+      .animate-discovery-scroll {
+        animation: discovery-scroll 40s linear infinite;
+      }
+    </style>
+  </div>
+
+  <!-- Discovery Room Items Gallery -->
+  <section class="mb-12">
+    <h2 class="text-3xl font-bold text-center text-yellow-200 mb-8">Discovery Room Featured Items</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="discovery-card bg-white rounded-xl shadow-xl border-2 border-blue-200 p-4 flex flex-col items-center">
+        <img src="./images/meta.jpeg" alt="metaQuest 3 Headset" class="h-48 w-auto object-contain mb-4 rounded-lg shadow-md" />
+        <div class="text-xl font-semibold text-blue-800 mb-2">MetaQuest 3 Headset</div>
+        <div class="text-gray-600 text-center">Immersive VR experiences for learning and creativity.</div>
+      </div>
+      <div class="discovery-card bg-white rounded-xl shadow-xl border-2 border-blue-200 p-4 flex flex-col items-center">
+        <img src="./images/active.jpg" alt="Active Floor" class="h-48 w-auto object-contain mb-4 rounded-lg shadow-md" />
+        <div class="text-xl font-semibold text-blue-800 mb-2">Active Floor</div>
+        <div class="text-gray-600 text-center">Interactive movement-based learning platform.</div>
+      </div>
+      <div class="discovery-card bg-white rounded-xl shadow-xl border-2 border-blue-200 p-4 flex flex-col items-center">
+        <img src="./images/touch.jpg" alt="Interactive Screen" class="h-48 w-auto object-contain mb-4 rounded-lg shadow-md" />
+        <div class="text-xl font-semibold text-blue-800 mb-2">Interactive Screen</div>
+        <div class="text-gray-600 text-center">Touch-enabled display for collaborative lessons.</div>
+      </div>
+      <div class="discovery-card bg-white rounded-xl shadow-xl border-2 border-blue-200 p-4 flex flex-col items-center">
+        <img src="./images/legos.jpeg" alt="Legos" class="h-48 w-auto object-contain mb-4 rounded-lg shadow-md" />
+        <div class="text-xl font-semibold text-blue-800 mb-2">Legos</div>
+        <div class="text-gray-600 text-center">Build, create, and explore with classic and advanced Lego sets.</div>
+      </div>
+      <div class="discovery-card bg-white rounded-xl shadow-xl border-2 border-blue-200 p-4 flex flex-col items-center">
+        <img src="./images/mbot2.jpg" alt="MBOT2 Advance" class="h-48 w-auto object-contain mb-4 rounded-lg shadow-md" />
+        <div class="text-xl font-semibold text-blue-800 mb-2">MBOT2 Advance</div>
+        <div class="text-gray-600 text-center">Advanced robotics for hands-on STEM learning.</div>
+      </div>
+      <div class="discovery-card bg-white rounded-xl shadow-xl border-2 border-blue-200 p-4 flex flex-col items-center">
+        <img src="./images/botley.jpeg" alt="Botley 2.0" class="h-48 w-auto object-contain mb-4 rounded-lg shadow-md" />
+        <div class="text-xl font-semibold text-blue-800 mb-2">Botley 2.0</div>
+        <div class="text-gray-600 text-center">Screen-free coding robot for early learners.</div>
+      </div>
+    </div>
+  </section>
 
   <!-- Footer Quick Links (Simprug only) -->
   <footer class="bg-blue-950 text-yellow-100 py-6 mt-0">

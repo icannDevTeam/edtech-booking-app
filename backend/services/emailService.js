@@ -8,6 +8,21 @@ apiKey.apiKey = process.env.BREVO_API_KEY;
 const senderEmail = process.env.SENDER_EMAIL || 'albert.arthur@binus.edu';
 
 exports.sendEmail = async (to, subject, text, data = {}) => {
+};
+
+// Alias for frontend compatibility
+exports.sendBookingConfirmation = async function({ name, email, date, time, cls }) {
+  // Compose subject and text
+  const subject = `Booking Confirmed: ${date} @ ${time}`;
+  const text = `Hi ${name}, your booking with Mr. Albert is confirmed for ${date} at ${time} (${cls}).`;
+  // Use sendEmail
+  return exports.sendEmail(email, subject, text, {
+    studentName: name,
+    studentClass: cls,
+    studentEmail: email,
+    date,
+    time
+  });
     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
     // HTML email template with BINUS Simprug logo and improved design
