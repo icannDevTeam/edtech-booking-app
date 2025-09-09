@@ -10,8 +10,8 @@ function generatePassword(length = 10) {
 // POST /api/request-access
 exports.requestAccess = async (req, res) => {
   const { email } = req.body;
-  if (!email || !email.endsWith('@binus.edu')) {
-    return res.status(400).json({ message: 'Only BINUSIAN emails allowed.' });
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required.' });
   }
   // Check if user already exists
   db.get('SELECT * FROM teachers WHERE email = ?', [email], async (err, row) => {

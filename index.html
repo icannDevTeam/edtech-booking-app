@@ -413,10 +413,7 @@
           alert("All fields are required.");
           return;
         }
-        if (!email.endsWith("@binus.edu") && !email.endsWith("@binus.org")) {
-          alert("Use your school email (@binus.edu or @binus.org)." );
-          return;
-        }
+        // Allow any email for login
         import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs}) => {
           const db = getFirestore();
           const usersCol = collection(db, "users");
@@ -514,7 +511,6 @@
         alert("All fields are required.");
         return;
       }
-      // Check if user exists
       import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs, addDoc}) => {
         const db = getFirestore();
         const usersCol = collection(db, "users");
@@ -529,18 +525,32 @@
             name, email, role, password, approved: true, createdAt: new Date().toISOString()
           });
           // Nodemailer (via Firebase Function) will send the code email automatically
-          alert("Sign-up successful! Your code has been sent to your email. Use it to log in.");
+          setUser({ name, email, role });
           hideAuthModal();
           renderAuthBar();
+          showWelcomeMsg(name);
           return;
         }
         const userData = userDoc.data();
-        alert("Account already exists. Please log in.");
+        setUser({ name: userData.name, email: userData.email, role: userData.role, id: userDoc.id });
         hideAuthModal();
         renderAuthBar();
+        showWelcomeMsg(userData.name);
       });
-    // EmailJS logic removed. All sign-up code emails are now sent by the backend (Firebase Function with Nodemailer).
     };
+
+    // Show a visible welcome message after login/signup
+    function showWelcomeMsg(name) {
+      if (!document.getElementById("welcomeMsg")) {
+        const msg = document.createElement("div");
+        msg.id = "welcomeMsg";
+        msg.className = "fixed top-4 right-4 bg-blue-800 text-white px-4 py-2 rounded shadow-lg z-50 fade-in";
+        msg.textContent = `Welcome, ${name}!`;
+        document.body.appendChild(msg);
+        setTimeout(()=>msg.remove(), 3500);
+      }
+    }
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, addDoc,
@@ -583,18 +593,18 @@
     let bookedTimes = new Set();
     let bookedDetails = [];
 
-    // Initialize date picker range → today … today+6
-    const today = new Date();
-    const pad = n => n.toString().padStart(2,"0");
-    const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    dateInput.min = iso(today);
-    rangeStart.min = iso(today);
-    rangeEnd.min = iso(today);
-    const maxDate = new Date(today.getTime() + 6*24*60*60*1000);
-    dateInput.max = iso(maxDate);
-    rangeStart.max = iso(maxDate);
-    rangeEnd.max = iso(maxDate);
-    dateInput.value = iso(today);
+  // Initialize date picker range → today … today+13 (2 weeks)
+  const today = new Date();
+  const pad = n => n.toString().padStart(2,"0");
+  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  dateInput.min = iso(today);
+  rangeStart.min = iso(today);
+  rangeEnd.min = iso(today);
+  const maxDate = new Date(today.getTime() + 13*24*60*60*1000);
+  dateInput.max = iso(maxDate);
+  rangeStart.max = iso(maxDate);
+  rangeEnd.max = iso(maxDate);
+  dateInput.value = iso(today);
 
     // Listen for changes
     dateInput.addEventListener("change", ()=>{
