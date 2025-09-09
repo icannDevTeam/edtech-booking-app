@@ -8,6 +8,38 @@ apiKey.apiKey = process.env.BREVO_API_KEY;
 const senderEmail = process.env.SENDER_EMAIL || 'albert.arthur@binus.edu';
 
 exports.sendEmail = async (to, subject, text, data = {}) => {
+  // Support single or multiple recipients
+  let recipients = Array.isArray(to) ? to : [to];
+  const SibApiV3Sdk = require('sib-api-v3-sdk');
+  const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+  const senderEmail = process.env.SENDER_EMAIL || 'albert.arthur@binus.edu';
+
+  // Compose HTML content if not provided
+  let htmlContent = text;
+  if (data && data.studentName && data.date && data.time) {
+    htmlContent = `
+      <div style="font-family: Arial, sans-serif;">
+        <h2>Booking Confirmed!</h2>
+        <p>Hi <b>${data.studentName}</b>,</p>
+        <p>Your booking is confirmed for <b>${data.date}</b> at <b>${data.time}</b>.</p>
+        <p>Class: <b>${data.studentClass || ''}</b></p>
+      </div>
+    `;
+  }
+
+  const sendSmtpEmail = {
+    to: recipients.map(email => ({ email })),
+    sender: { email: senderEmail, name: 'Mr. Albert (EdTech Booking)' },
+    subject: subject,
+    textContent: text,
+    htmlContent: htmlContent
+  };
+  try {
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('Brevo email sent to', recipients);
+  } catch (err) {
+    console.error('Brevo Email Error:', err);
+  }
 };
 
 // Alias for frontend compatibility

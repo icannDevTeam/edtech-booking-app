@@ -4,35 +4,41 @@ const { sendEmail } = require('../services/emailService');
 exports.createBooking = (req, res) => {
     const { day, time, studentName, studentClass, studentEmail } = req.body;
 
-    // Check if slot already booked
-    db.get(`SELECT * FROM bookings WHERE day = ? AND time = ?`, [day, time], (err, row) => {
-        if (row) {
-            return res.status(400).json({ message: 'This time slot is already booked!' });
-        }
+        // Check if slot already booked
+        db.get(`SELECT * FROM bookings WHERE day = ? AND time = ?`, [day, time], (err, row) => {
+                if (row) {
+                        return res.status(400).json({ message: 'This time slot is already booked!' });
+                }
 
-        const createdAt = new Date().toISOString();
-        db.run(
-            `INSERT INTO bookings (day, time, studentName, studentClass, studentEmail, createdAt)
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [day, time, studentName, studentClass, studentEmail, createdAt],
-            function (err) {
-                if (err) return res.status(500).json({ error: err.message });
+                const createdAt = new Date().toISOString();
+                db.run(
+                        `INSERT INTO bookings (day, time, studentName, studentClass, studentEmail, createdAt)
+                         VALUES (?, ?, ?, ?, ?, ?)`,
+                        [day, time, studentName, studentClass, studentEmail, createdAt],
+                        function (err) {
+                                if (err) return res.status(500).json({ error: err.message });
 
-                // Send confirmation email to teacher and booker
+                                // Send confirmation email to both booker and Mr. Albert
+                                const adminEmail = process.env.ADMIN_EMAIL || 'albert.arthur@binus.edu';
+                                sendEmail([
+                                    studentEmail,
+                                    adminEmail
+                                ],
+                                    'Booking Confirmation',
+                                    `Hey ${studentName}, your booking for ${day} at ${time} is confirmed!`,
+                                    {
+                                        studentName,
+                                        studentClass,
+                                        studentEmail,
+                                        date: day,
+                                        time
+                                    }
+                                );
 
-                // Send confirmation email to booker
-                sendEmail(studentEmail, 'Booking Confirmation', 
-                    `Hey ${studentName}, your booking for ${day} at ${time} is confirmed!`);
-
-                // Send notification to admin/teacher
-                const adminEmail = process.env.ADMIN_EMAIL || 'albert.arthur@binus.edu';
-                sendEmail(adminEmail, 'New Booking Alert', 
-                    `${studentName} (${studentClass}) booked ${day} at ${time}`);
-
-                res.status(201).json({ id: this.lastID, message: 'Booking successful!' });
-            }
-        );
-    });
+                                res.status(201).json({ id: this.lastID, message: 'Booking successful!' });
+                        }
+                );
+        });
 };
 
 exports.getBookings = (req, res) => {
