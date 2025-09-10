@@ -413,7 +413,10 @@
           alert("All fields are required.");
           return;
         }
-        // Allow any email for login
+        if (!email.endsWith("@binus.edu") && !email.endsWith("@binus.org")) {
+          alert("Use your school email (@binus.edu or @binus.org)." );
+          return;
+        }
         import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs}) => {
           const db = getFirestore();
           const usersCol = collection(db, "users");
@@ -511,6 +514,7 @@
         alert("All fields are required.");
         return;
       }
+      // Check if user exists
       import("https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js").then(async ({getFirestore, collection, query, where, getDocs, addDoc}) => {
         const db = getFirestore();
         const usersCol = collection(db, "users");
@@ -525,32 +529,18 @@
             name, email, role, password, approved: true, createdAt: new Date().toISOString()
           });
           // Nodemailer (via Firebase Function) will send the code email automatically
-          setUser({ name, email, role });
+          alert("Sign-up successful! Your code has been sent to your email. Use it to log in.");
           hideAuthModal();
           renderAuthBar();
-          showWelcomeMsg(name);
           return;
         }
         const userData = userDoc.data();
-        setUser({ name: userData.name, email: userData.email, role: userData.role, id: userDoc.id });
+        alert("Account already exists. Please log in.");
         hideAuthModal();
         renderAuthBar();
-        showWelcomeMsg(userData.name);
       });
+    // EmailJS logic removed. All sign-up code emails are now sent by the backend (Firebase Function with Nodemailer).
     };
-
-    // Show a visible welcome message after login/signup
-    function showWelcomeMsg(name) {
-      if (!document.getElementById("welcomeMsg")) {
-        const msg = document.createElement("div");
-        msg.id = "welcomeMsg";
-        msg.className = "fixed top-4 right-4 bg-blue-800 text-white px-4 py-2 rounded shadow-lg z-50 fade-in";
-        msg.textContent = `Welcome, ${name}!`;
-        document.body.appendChild(msg);
-        setTimeout(()=>msg.remove(), 3500);
-      }
-    }
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import {
       getFirestore, collection, getDocs, addDoc,
@@ -579,11 +569,11 @@
 
     // Hard-coded slots by weekday
     const timeSlots = {
-      Monday:    ["7:30-7:50","9:10-9:30","11:30-12:10","14:10-15:30"],
-      Tuesday:   ["7:30-7:50","9:10-9:30","11:30-12:10"],
-      Wednesday: ["7:30-7:50","10:50-12:10"],
-      Thursday:  ["7:30-7:50","9:10-9:30","11:30-12:10"],
-      Friday:    ["7:30-7:50","10:50-11:30","13:30-14:10"]
+  Monday:    ["7:30-7:50","9:10-9:30","11:30-12:10","14:10-15:30"],
+  Tuesday:   ["7:30-7:50","9:10-9:30","11:30-12:10"],
+  Wednesday: ["7:30-7:50","10:50-12:10"],
+  Thursday:  ["7:30-7:50","9:10-9:30","11:30-12:10"],
+  Friday:    ["7:30-7:50","10:50-11:30","13:30-14:10","13:00-15:30"]
     };
 
     // DOM refs
@@ -593,18 +583,18 @@
     let bookedTimes = new Set();
     let bookedDetails = [];
 
-  // Initialize date picker range → today … today+13 (2 weeks)
-  const today = new Date();
-  const pad = n => n.toString().padStart(2,"0");
-  const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  dateInput.min = iso(today);
-  rangeStart.min = iso(today);
-  rangeEnd.min = iso(today);
-  const maxDate = new Date(today.getTime() + 13*24*60*60*1000);
-  dateInput.max = iso(maxDate);
-  rangeStart.max = iso(maxDate);
-  rangeEnd.max = iso(maxDate);
-  dateInput.value = iso(today);
+    // Initialize date picker range → today … today+6
+    const today = new Date();
+    const pad = n => n.toString().padStart(2,"0");
+    const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    dateInput.min = iso(today);
+    rangeStart.min = iso(today);
+    rangeEnd.min = iso(today);
+    const maxDate = new Date(today.getTime() + 6*24*60*60*1000);
+    dateInput.max = iso(maxDate);
+    rangeStart.max = iso(maxDate);
+    rangeEnd.max = iso(maxDate);
+    dateInput.value = iso(today);
 
     // Listen for changes
     dateInput.addEventListener("change", ()=>{
@@ -1069,6 +1059,128 @@ END:VCALENDAR`;
 
     // Kick things off
     loadBookings();
+  </script>
+  <!-- Simple Chatbot Widget -->
+  <style>
+    #chatbotWidgetBtn {
+      position: fixed; bottom: 32px; right: 32px; z-index: 100;
+      background: #2563eb; color: #fff; border-radius: 50%; width: 60px; height: 60px;
+      display: flex; align-items: center; justify-content: center; font-size: 2em;
+      box-shadow: 0 4px 16px #0002; cursor: pointer;
+      transition: background 0.2s;
+    }
+    #chatbotWidgetBtn:hover { background: #1742a0; }
+    #chatbotWidget {
+      position: fixed; bottom: 110px; right: 32px; z-index: 101;
+      width: 320px; max-width: 95vw;
+      background: #fff; border-radius: 16px; box-shadow: 0 8px 32px #0003;
+      display: none; flex-direction: column;
+    }
+    #chatbotHeader { background: #2563eb; color: #fff; border-radius: 16px 16px 0 0; padding: 14px 18px; font-weight: bold; font-size: 1.1em; display: flex; align-items: center; justify-content: space-between; }
+    #chatbotClose { background: none; border: none; color: #fff; font-size: 1.2em; cursor: pointer; }
+    #chatbotMessages { padding: 16px; min-height: 120px; max-height: 260px; overflow-y: auto; font-size: 1em; }
+    .chatbot-msg { margin-bottom: 10px; }
+    .chatbot-msg.user { text-align: right; color: #2563eb; }
+    .chatbot-msg.bot { text-align: left; color: #222; }
+    #chatbotInputBar { display: flex; border-top: 1px solid #eee; }
+    #chatbotInput { flex: 1; border: none; padding: 12px; font-size: 1em; border-radius: 0 0 0 16px; }
+    #chatbotSend { background: #2563eb; color: #fff; border: none; padding: 0 18px; font-size: 1.1em; border-radius: 0 0 16px 0; cursor: pointer; }
+    #chatbotSend:hover { background: #1742a0; }
+  </style>
+  <div id="chatbotWidgetBtn" title="Chat with us!"><i class="fas fa-comment-dots"></i></div>
+  <div id="chatbotWidget">
+    <div id="chatbotHeader">Ask EdTech Bot <button id="chatbotClose">&times;</button></div>
+    <div id="chatbotMessages"></div>
+    <form id="chatbotInputBar" autocomplete="off">
+      <input id="chatbotInput" type="text" placeholder="Type your question..." required />
+      <button id="chatbotSend" type="submit"><i class="fas fa-paper-plane"></i></button>
+    </form>
+  </div>
+  <script>
+    // --- Chatbot Widget Logic ---
+    const chatbotBtn = document.getElementById('chatbotWidgetBtn');
+    const chatbot = document.getElementById('chatbotWidget');
+    const chatbotClose = document.getElementById('chatbotClose');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInputBar = document.getElementById('chatbotInputBar');
+    const chatbotInput = document.getElementById('chatbotInput');
+    chatbotBtn.onclick = () => { chatbot.style.display = 'flex'; chatbotInput.focus(); };
+    chatbotClose.onclick = () => { chatbot.style.display = 'none'; };
+    function addMsg(text, who) {
+      const msg = document.createElement('div');
+      msg.className = 'chatbot-msg ' + who;
+      msg.textContent = text;
+      chatbotMessages.appendChild(msg);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+    // Expanded FAQ and process logic
+    function botReply(q) {
+      const lower = q.toLowerCase();
+      // Booking process
+      if (lower.match(/how.*book/)) return 'To book: 1) Select a date and slot. 2) Fill in your details. 3) Confirm. You will get a confirmation email.';
+      if (lower.includes('who can book')) return 'Any teacher or staff can book the Discovery Room.';
+      if (lower.includes('how many') && lower.includes('slots')) return 'You can book one slot per day. Slots are limited and first-come, first-served.';
+      if (lower.includes('change') && lower.includes('booking')) return 'To change a booking, please cancel and rebook, or contact Mr. Albert.';
+      if (lower.includes('cancel')) return 'To cancel, reply to your confirmation email or contact Mr. Albert.';
+      if (lower.includes('teacher portal')) return 'Teachers can use the Teacher Portal for special access and management.';
+      if (lower.includes('waiting list')) return 'If a slot is full, you can join the waiting list. You will be notified if it becomes available.';
+      if (lower.includes('email')) return 'You will receive a confirmation email after booking. Check your spam folder if you do not see it.';
+      if (lower.includes('location')) return 'The Discovery Room is in Tower A, 2nd Floor, BINUS School Simprug.';
+      if (lower.includes('contact')) return 'You can contact Mr. Albert at albert.arthur@binus.edu.';
+      if (lower.includes('rules')) return 'Please respect the Discovery Room rules: no food/drink, return items, and keep the space tidy.';
+      if (lower.includes('equipment') || lower.includes('tools')) return 'The Discovery Room has VR headsets, robots, Legos, interactive screens, and more!';
+      if (lower.includes('faq')) return 'FAQ: 1) How to book? 2) Can I cancel? 3) Where is the room? 4) Who can book? 5) What equipment is available?';
+      if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) return 'Hello! How can I help you today?';
+      return null; // Unknown, trigger fallback
+    }
+
+    // Fallback: collect name/email for unknown questions
+    let pendingUnknown = false;
+    let pendingQuestion = '';
+    chatbotInputBar.onsubmit = e => {
+      e.preventDefault();
+      const q = chatbotInput.value.trim();
+      if (!q) return;
+      addMsg(q, 'user');
+      chatbotInput.value = '';
+      if (pendingUnknown === 'name') {
+        window._chatbotUserName = q;
+        addMsg('Thanks! What is your email address?', 'bot');
+        pendingUnknown = 'email';
+        return;
+      }
+      if (pendingUnknown === 'email') {
+        window._chatbotUserEmail = q;
+        addMsg('Thank you! I will get in touch with Mr. Albert and you will receive a reply via email.', 'bot');
+        // Send info to backend to email Mr. Albert
+        fetch('/api/chatbot/fallback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: window._chatbotUserName,
+            email: window._chatbotUserEmail,
+            question: pendingQuestion
+          })
+        }).then(r => r.json()).then(data => {
+          if (data && data.error) {
+            addMsg('Sorry, there was a problem sending your question. Please try again later.', 'bot');
+          }
+        }).catch(() => {
+          addMsg('Sorry, there was a problem sending your question. Please try again later.', 'bot');
+        });
+        pendingUnknown = false;
+        pendingQuestion = '';
+        return;
+      }
+      const answer = botReply(q);
+      if (answer) {
+        setTimeout(() => addMsg(answer, 'bot'), 600);
+      } else {
+        pendingUnknown = 'name';
+        pendingQuestion = q;
+        setTimeout(() => addMsg("I'm not sure about that. May I have your name so I can get in touch with Mr. Albert for you?", 'bot'), 600);
+      }
+    };
   </script>
   <!-- Binus Spirit Values Animation (no dividing line) -->
   <div class="w-full overflow-x-hidden bg-blue-950 py-3 mt-10 mb-2 relative" style="height: 2.5rem;">
